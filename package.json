@@ -1,0 +1,23 @@
+{
+  "name": "game-server",
+  "version": "0.0.1",
+  "description": "A server for a game maker game.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/martinneumann/game-server.git"
+  },
+  "author": "Martin Neumann",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/martinneumann/game-server/issues"
+  },
+  "homepage": "https://github.com/martinneumann/game-server#readme",
+  "dependencies": {
+    "net": "^1.0.2"
+  }
+}
