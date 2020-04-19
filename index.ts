@@ -55,8 +55,9 @@ interface ChatMessage {
 class GameWorld {
     connectedClients: Array<Player> = [];
     serverObject: net.Server;
-    ip: string = '192.168.178.55';
+    ip: string = '192.168.178.62';
     port: number = 1337;
+    buffer: string;
 
     /**
      * Parses the received data from the client.
@@ -64,10 +65,10 @@ class GameWorld {
      * messagePurpose: pose, chat, newplayer
      */
     private parseData(data: string) {
-        console.log(`Parsing this string:`);
-        console.log(JSON.stringify(data));
+        data = data.split("<start>")[1].split("<end>")[0];
+        data = data.replace(/[\n\r\0]+/g, '');
+        console.log(`Parsing: ${data}`);
         const dataAsJson = JSON.parse(data);
-        console.log(`Parsed successfully, data is: ${dataAsJson}`);
         switch (dataAsJson.messagePurpose) {
             case 'pose':
                 this.updateGameInfo(this.connectedClients.find(client => client.id === dataAsJson.sender), dataAsJson.payload)
@@ -82,8 +83,6 @@ class GameWorld {
             default:
                 console.error(`Error while parsing a client's message`, `Unknown message purpose`);
                 return;
-
-
         }
     }
 
@@ -93,14 +92,20 @@ class GameWorld {
     public startServer() {
         this.serverObject = net.createServer(socket => {
             socket.on('data', data => {
-
-                console.log(`Received data: ${String.fromCharCode.apply(0, data)}`);
-                this.parseData(String.fromCharCode.apply(0, data));
+                console.log(`Received data: ${data}`);
+                this.buffer += data;
+                if (this.buffer.includes("<start>") && this.buffer.includes("<end>")){
+                    this.parseData(String.fromCharCode.apply(0, data));
+                    this.buffer = "";
+                }
             });
 
             socket.on('end', data => {
                 console.log(`A player disconnected: ${JSON.stringify(data)}`);
                 this.disconnectPlayer(undefined);
+            });
+            socket.on('error', () => {
+                console.log(`A player has caused an error.`);
             });
         });
         this.serverObject.listen(this.port, this.ip);
@@ -122,6 +127,7 @@ class GameWorld {
         const foundPlayer = this.connectedClients.find(player => player.id === sendingPlayer.id);
         if (foundPlayer !== undefined) {
             foundPlayer.pose = data;
+            console.log(`${JSON.stringify(foundPlayer.pose)}`);
         } else {
             console.error(`Error while updating game info:`, `Tried to update an unknown player's pose.`);
         }
