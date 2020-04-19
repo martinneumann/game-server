@@ -55,7 +55,7 @@ interface ChatMessage {
 class GameWorld {
     connectedClients: Array<Player> = [];
     serverObject: net.Server;
-    ip: string = '127.0.0.1';
+    ip: string = '192.168.178.55';
     port: number = 1337;
 
     /**
@@ -64,7 +64,10 @@ class GameWorld {
      * messagePurpose: pose, chat, newplayer
      */
     private parseData(data: string) {
+        console.log(`Parsing this string:`);
+        console.log(JSON.stringify(data));
         const dataAsJson = JSON.parse(data);
+        console.log(`Parsed successfully, data is: ${dataAsJson}`);
         switch (dataAsJson.messagePurpose) {
             case 'pose':
                 this.updateGameInfo(this.connectedClients.find(client => client.id === dataAsJson.sender), dataAsJson.payload)
@@ -91,7 +94,7 @@ class GameWorld {
         this.serverObject = net.createServer(socket => {
             socket.on('data', data => {
 
-                // console.log(`Received data: ${String.fromCharCode.apply(0, data)}`);
+                console.log(`Received data: ${String.fromCharCode.apply(0, data)}`);
                 this.parseData(String.fromCharCode.apply(0, data));
             });
 
@@ -100,7 +103,7 @@ class GameWorld {
                 this.disconnectPlayer(undefined);
             });
         });
-        this.serverObject.listen(this.port, '127.0.0.1');
+        this.serverObject.listen(this.port, this.ip);
     }
 
 
