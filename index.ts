@@ -55,9 +55,13 @@ interface ChatMessage {
 class GameWorld {
     connectedClients: Array<Player> = [];
     serverObject: net.Server;
-    ip: string = '192.168.178.62';
+    ip: string = 'localhost';
     port: number = 1337;
     buffer: string;
+
+    constructor(ip: string) {
+        this.ip = ip;
+    }
 
     /**
      * Parses the received data from the client.
@@ -91,21 +95,22 @@ class GameWorld {
      */
     public startServer() {
         this.serverObject = net.createServer(socket => {
+            console.log(`Listening on ${this.ip}:${this.port}`)
             socket.on('data', data => {
                 console.log(`Received data: ${data}`);
                 this.buffer += data;
-                if (this.buffer.includes("<start>") && this.buffer.includes("<end>")){
+                if (this.buffer.includes("<start>") && this.buffer.includes("<end>")) {
                     this.parseData(String.fromCharCode.apply(0, data));
                     this.buffer = "";
                 }
             });
 
-            socket.on('end', data => {
-                console.log(`A player disconnected: ${JSON.stringify(data)}`);
+            socket.on('end', _data => {
+                console.log(`A player disconnected: ${JSON.stringify(_data)}`);
                 this.disconnectPlayer(undefined);
             });
-            socket.on('error', () => {
-                console.log(`A player has caused an error.`);
+            socket.on('error', error => {
+                console.error(`A player has caused an error:`, error);
             });
         });
         this.serverObject.listen(this.port, this.ip);
@@ -167,7 +172,13 @@ console.log(`Starting server.`)
  * 3) Wait for clients
  */
 
-const mainWorld: GameWorld = new GameWorld();
-mainWorld.startServer();
+require('dns').lookup(require('os').hostname(), function (err, add) {
+    const mainWorld: GameWorld = new GameWorld(add);
+    mainWorld.startServer();
+});
 
+process.on('SIGKILL', () => {
+    console.log(`Closing connections...`);
+    // @todo add call to mainworld.closeserver()
+});
 
