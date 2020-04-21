@@ -24,9 +24,9 @@ import * as net from 'net';
  *******/
 
 interface Pose {
-    x: 10;
-    y: 10;
-    w: 0;  // orientation in whatever unit game maker provides
+    x: number;
+    y: number;
+    w: number;  // orientation in whatever unit game maker provides
 }
 
 /**
@@ -34,7 +34,7 @@ interface Pose {
  */
 class Player {
     id: String; // Must be unique
-    pose: Pose;
+    pose: Pose = {x: 3, y: 3, w: 3};
 
 
     constructor(name: String) {
@@ -54,10 +54,10 @@ interface ChatMessage {
 
 class GameWorld {
     connectedClients: Array<Player> = [];
-    serverObject: net.Server;
+    serverObject: net.Server = new net.Server;
     ip: string = 'localhost';
     port: number = 1337;
-    buffer: string;
+    buffer: string = "";
 
     constructor(ip: string) {
         this.ip = ip;
