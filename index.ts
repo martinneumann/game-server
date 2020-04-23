@@ -34,11 +34,13 @@ interface Pose {
  */
 class Player {
     id: String; // Must be unique
-    pose: Pose = {x: 3, y: 3, w: 3};
+    pose: Pose = { x: 3, y: 3, w: 3 };
+    socket: net.Socket = new net.Socket();
 
 
-    constructor(name: String) {
+    constructor(name: String, socket: net.Socket) {
         this.id = name;
+        this.socket = socket;
     }
 }
 
@@ -95,7 +97,11 @@ class GameWorld {
      */
     public startServer() {
         this.serverObject = net.createServer(socket => {
-            console.log(`Listening on ${this.ip}:${this.port}`)
+
+            socket.on('connect', (_data: any) => {
+                console.log(`A new connection was established: ${JSON.stringify(_data)}`);
+            });
+
             socket.on('data', data => {
                 console.log(`Received data: ${data}`);
                 this.buffer += data;
@@ -105,16 +111,27 @@ class GameWorld {
                 }
             });
 
-            socket.on('end', _data => {
+            socket.on('end', (_data: any) => {
                 console.log(`A player disconnected: ${JSON.stringify(_data)}`);
-                this.disconnectPlayer(undefined);
             });
+
             socket.on('error', error => {
                 console.error(`A player has caused an error:`, error);
             });
+
         });
+        console.log(`Listening on ${this.ip}:${this.port}`)
         this.serverObject.listen(this.port, this.ip);
+
+        /**
+         * Connection event - add new client
+         */
+        this.serverObject.on('connection', data => {
+            console.log(`New client connected: ${JSON.stringify(data)}`);
+        });
+
     }
+
 
 
     public closeServer() {
@@ -151,8 +168,17 @@ class GameWorld {
      * Connects a new player.
      * Called when a new client connects to the server.
      */
-    connectPlayer(name: string) {
-        this.connectedClients.push(new Player(name))
+    connectPlayer(name: string, socket: net.Socket) {
+        // Notify all clients of new player
+        this.connectedClients.push(new Player(name, socket))
+        console.log(`Notifying all clients of new player.`)
+        /*
+        this.connectedClients.forEach(client => {
+            this.socketObjects.write(`For ${JSON.stringify(client)}: Hello there.`, err => {
+                console.log(`This happened: ${JSON.stringify(err)}`)
+            });
+        });
+        */
     }
 
     /**
@@ -171,8 +197,8 @@ console.log(`Starting server.`)
  * 2) Run server
  * 3) Wait for clients
  */
-
-require('dns').lookup(require('os').hostname(), function (err, add) {
+require('dns').lookup(require('os').hostname(), function (err: any, add: string) {
+    if (err) console.error(`Error during dns lookup:`, err)
     const mainWorld: GameWorld = new GameWorld(add);
     mainWorld.startServer();
 });

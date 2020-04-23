@@ -16,7 +16,7 @@ client.connect(1337, '192.168.178.61', function () {
         if (err) {
             console.error(`Error while parsing JSON:`, err);
         }
-        client.write(newClientString);    
+        // client.write(newClientString);    
 
     });
 });
