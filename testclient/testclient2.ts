@@ -7,7 +7,7 @@ import { timer } from 'rxjs';
 /*
  * A client for testing multiple connections, since game maker only runs one instance at a time during debug.
  */
-const newClientString = '<start>{ "sender": "Dudebro", "messagePurpose\": \"newplayer\", \"payload\": \"Dudebro\" }<end>';
+const newClientString = '<start>{ "sender": "Testclient TS 1", "messagePurpose\": \"newplayer\", \"payload\": \"TestClient TS 1\" }<end>';
 
 class GameClient {
 
