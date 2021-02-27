@@ -1,0 +1,35 @@
+<header></header>
+
+<body>
+    <canvas id="game" width="100%" height="100%">
+
+    </canvas>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+
+        var canvas = document.getElementById('game');
+        var ctx = canvas.getContext("2d");
+
+        window.addEventListener('keydown', function (e) {
+            e.preventDefault();
+            if (event.key) {
+                socket.emit('keypressed', event.key);
+                event.key = '';
+            }
+        });
+
+        // New user connects.
+        socket.on('newuser', (userid) => {
+            console.log(`New user ${userid} connected.`);
+            ctx.beginPath();
+            ctx.rect(20, 20, 150, 100);
+            ctx.stroke();
+        });
+
+        // General key press or movement or whatever.
+        socket.on('keypressed', function (msg) {
+
+        });
+    </script>
+</body>

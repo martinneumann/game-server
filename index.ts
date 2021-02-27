@@ -1,4 +1,5 @@
-import * as net from 'net';
+// eslint-disable-next-line no-unused-vars
+import { Socket } from 'socket.io';
 
 /**
  * Central server because I'm lazy.
@@ -24,9 +25,9 @@ import * as net from 'net';
  *******/
 
 interface Pose {
-    x: 10;
-    y: 10;
-    w: 0;  // orientation in whatever unit game maker provides
+    x: number;
+    y: number;
+    w: number;  // orientation in whatever unit game maker provides
 }
 
 /**
@@ -52,11 +53,13 @@ interface ChatMessage {
 
 }
 
+
+/**
+ * Main server class.
+ */
+// eslint-disable-next-line no-unused-vars
 class GameWorld {
     connectedClients: Array<Player> = [];
-    serverObject: net.Server;
-    ip: string = '127.0.0.1';
-    port: number = 1337;
 
     /**
      * Parses the received data from the client.
@@ -82,30 +85,6 @@ class GameWorld {
 
 
         }
-    }
-
-    /**
-     * Starts the game server.
-     */
-    public startServer() {
-        this.serverObject = net.createServer(socket => {
-            socket.on('data', data => {
-
-                // console.log(`Received data: ${String.fromCharCode.apply(0, data)}`);
-                this.parseData(String.fromCharCode.apply(0, data));
-            });
-
-            socket.on('end', data => {
-                console.log(`A player disconnected: ${JSON.stringify(data)}`);
-                this.disconnectPlayer(undefined);
-            });
-        });
-        this.serverObject.listen(this.port, '127.0.0.1');
-    }
-
-
-    public closeServer() {
-        this.serverObject.close();
     }
 
     /**
@@ -150,15 +129,45 @@ class GameWorld {
     }
 }
 
-console.log(`Starting server.`)
 
-/**
- * 1) Create new world object
- * 2) Run server
- * 3) Wait for clients
- */
+const app = require('express')();
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
 
-const mainWorld: GameWorld = new GameWorld();
-mainWorld.startServer();
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
 
+console.log(`Creating game world...`);
+const gameWorld = new GameWorld();
 
+http.listen(3000, () => {
+    console.log('Server listening on *:3000');
+
+});
+
+io.on('connection', (socket: Socket) => {
+    socket.emit('newuser', socket.id);
+
+    console.log(`A user connected. Socket: ${socket.id} `);
+    gameWorld.connectPlayer(socket.id);
+
+    socket.on('disconnect', () => {
+        console.log(`user disconnected. Socket: ${socket.id}`);
+    });
+
+    socket.on('keypressed', (msg) => {
+        console.log(`player ${socket.id} pressed key: ` + msg);
+
+        switch (msg) {
+            case 'a':
+            case 'A':
+                gameWorld.updateGameInfo(gameWorld.connectedClients.find(x => x.id == socket.id), { x: 1, y: 2, w: 90 });
+                break;
+            default:
+                console.log(`Command not valid.`);
+
+        }
+        socket.emit('movement',)
+    });
+});

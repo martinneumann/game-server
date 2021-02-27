@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./dist/index.js",
-    "build": "./node_modules/.bin/eslint index.ts && tsc --outDir ./dist index.ts",
+    "build": "./node_modules/.bin/eslint index.ts && tsc --outDir ./dist index.ts && cp index.html ./dist/index.html",
     "test": "test"
   },
   "repository": {
@@ -20,7 +20,9 @@
   "homepage": "https://github.com/martinneumann/game-server#readme",
   "dependencies": {
     "@types/node": "^13.13.0",
+    "express": "^4.17.1",
     "net": "^1.0.2",
+    "socket.io": "^3.1.2",
     "typescript": "^3.8.3",
     "uuidv4": "^6.0.7"
   },
