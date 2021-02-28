@@ -27,12 +27,29 @@
             }
         }
 
-        function draw(){
+        function gridLines(GlobalOffsetX, GlobalOffsetY, cellWidth = 64, lineWidth = 2){
+            offsetX = GlobalOffsetX%(cellWidth * 2)
+            offsetY = GlobalOffsetY%(cellWidth * 2)
+            swapColors = offsetX > cellWidth & offsetY > cellWidth
+            numCellsX = Math.ceil(canvas.width / cellWidth) + 1
+            numCellsY = Math.ceil(canvas.height / cellWidth) + 1
             ctx.fillStyle = "#222222"
-            ctx.fillRect(0,0,canvas.width, canvas.height);
+            for (let i = -1; i < numCellsX; i++){
+                ctx.fillRect(i * cellWidth - offsetX, 0,
+                             lineWidth, canvas.height)
+            }
+            for (let i = -1; i < numCellsY; i ++){
+                ctx.fillRect(0, i * cellWidth - offsetY,
+                             canvas.width, lineWidth)
+                }
+        }
+
+        function draw(){
+            //ctx.fillStyle = "#222222"
+            ctx.clearRect(0,0,canvas.width, canvas.height);
             const canvasCenter = [canvas.width / 2, canvas.height / 2]
             const camPos = [player.pose.x + mouseOffset[0]/2, player.pose.y + mouseOffset[1]/2]
-
+            gridLines(camPos[0], camPos[1])
             for (var playerId in gameState) {
                 ctx.fillStyle = gameState[playerId]["color"];
                 ctx.fillRect(canvasCenter[0] + gameState[playerId]["pose"]["x"] - camPos[0], 
