@@ -58,7 +58,6 @@ class GameWorld {
         sendingPlayer.pose.x += difference.x;
         sendingPlayer.pose.y += difference.y;
         sendingPlayer.pose.w += difference.w;
-
     }
 
     /**
