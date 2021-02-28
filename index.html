@@ -21,18 +21,18 @@
        ">
         <div>
             <h1>Hi, please log in or register.</h1>
-            <form onsubmit="login()">
+            <form>
                 <input>
                 <input type="password">
-                <button type="submit">Log in</button>
+                <button type="button" onclick="login()">Log in</button>
             </form>
         </div>
         <div>
             <h2>Or register, I don't care.</h2>
-            <form onsubmit="register()">
+            <form>
                 <input>
                 <input type="password">
-                <button type="submit">Register</button>
+                <button type="button" onclick="register()">Register</button>
             </form>
         </div>
     </div>
@@ -146,6 +146,9 @@
 
         // Log in
         function login(name, pwd) {
+            console.log(name)
+            console.log(pwd)
+
 
         }
 
