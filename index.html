@@ -21,21 +21,25 @@
        ">
         <div>
             <h1>Hi, please log in or register.</h1>
-            <form>
+            <form onsubmit="login()">
                 <input>
                 <input type="password">
+                <button type="submit">Log in</button>
             </form>
         </div>
         <div>
             <h2>Or register, I don't care.</h2>
-            <form>
+            <form onsubmit="register()">
                 <input>
                 <input type="password">
+                <button type="submit">Register</button>
             </form>
         </div>
     </div>
     <script src="/socket.io/socket.io.js"></script>
     <script>
+
+        addeventlisteners();
         class Pose {
             x;
             y;
@@ -107,25 +111,7 @@
         var canvas = document.getElementById('game');
         var ctx = canvas.getContext("2d");
 
-        window.addEventListener('mousemove', function (e) {
-            mouseOffset = [e.offsetX - canvas.width / 2, e.offsetY - canvas.height / 2];
-        })
 
-        window.addEventListener('keydown', function (e) {
-            e.preventDefault();
-            dirUp = dirUp | (event.key.toLowerCase() == 'w')
-            dirDown = dirDown | (event.key.toLowerCase() == 's')
-            dirLeft = dirLeft | (event.key.toLowerCase() == 'a')
-            dirRight = dirRight | (event.key.toLowerCase() == 'd')
-        })
-
-        window.addEventListener('keyup', function (e) {
-            e.preventDefault();
-            dirUp = dirUp & !(event.key.toLowerCase() == 'w')
-            dirDown = dirDown & !(event.key.toLowerCase() == 's')
-            dirLeft = dirLeft & !(event.key.toLowerCase() == 'a')
-            dirRight = dirRight & !(event.key.toLowerCase() == 'd')
-        });
 
         function sendUpdate() {
             diffPose.x = 0
@@ -149,6 +135,8 @@
             player = new PlayerState(userid, new Pose(0, 0, 0));
         });
 
+
+
         // General key press or movement or whatever.
         socket.on('movement', function (msg) {
             gameState = JSON.parse(msg)
@@ -163,7 +151,42 @@
 
         // register
         function register(name, pwd) {
+            console.log(name)
+            console.log(pwd)
 
+        }
+
+        // Login was successful
+        socket.on('loginsuccessful', function (msg) {
+
+        });
+
+        // Register was successful
+        socket.on('registersuccessful', function (msg) {
+
+        });
+
+
+        function addeventlisteners() {
+            window.addEventListener('mousemove', function (e) {
+                mouseOffset = [e.offsetX - canvas.width / 2, e.offsetY - canvas.height / 2];
+            })
+
+            window.addEventListener('keydown', function (e) {
+                e.preventDefault();
+                dirUp = dirUp | (event.key.toLowerCase() == 'w')
+                dirDown = dirDown | (event.key.toLowerCase() == 's')
+                dirLeft = dirLeft | (event.key.toLowerCase() == 'a')
+                dirRight = dirRight | (event.key.toLowerCase() == 'd')
+            })
+
+            window.addEventListener('keyup', function (e) {
+                e.preventDefault();
+                dirUp = dirUp & !(event.key.toLowerCase() == 'w')
+                dirDown = dirDown & !(event.key.toLowerCase() == 's')
+                dirLeft = dirLeft & !(event.key.toLowerCase() == 'a')
+                dirRight = dirRight & !(event.key.toLowerCase() == 'd')
+            });
         }
 
     </script>
