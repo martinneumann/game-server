@@ -64,6 +64,10 @@
         var player;
         var mouseOffset = (0,0);
         var gameState;
+        var dirUp = false;
+        var dirDown = false;
+        var dirLeft = false;
+        var dirRight = false;
 
         var canvas = document.getElementById('game');
         var ctx = canvas.getContext("2d");
@@ -74,35 +78,34 @@
 
         window.addEventListener('keydown', function (e) {
             e.preventDefault();
-            diffPose.x = 0;
-            diffPose.y = 0;
-            switch (event.key) {
-                case 'w':
-                case 'W':
-                    diffPose.y = -10;
-                    break;
-                case 'a':
-                case 'A':
-                    diffPose.x = -10;
-                    break;
-                case 's':
-                case 'S':
-                    diffPose.y = 10;
-                    break;
-                case 'd':
-                case 'D':
-                    diffPose.x = 10;
-                    break;
-                default:
-                    break;
-            }
-            if (event.key) {
-                socket.emit('keypressed', diffPose);
-                event.key = '';
-            }
+            dirUp = dirUp | (event.key.toLowerCase() == 'w')
+            dirDown = dirDown | (event.key.toLowerCase() == 's')
+            dirLeft = dirLeft | (event.key.toLowerCase() == 'a')
+            dirRight = dirRight | (event.key.toLowerCase() == 'd')
+        })
+
+        window.addEventListener('keyup', function (e) {
+            e.preventDefault();
+            dirUp = dirUp & !(event.key.toLowerCase() == 'w')
+            dirDown = dirDown & !(event.key.toLowerCase() == 's')
+            dirLeft = dirLeft & !(event.key.toLowerCase() == 'a')
+            dirRight = dirRight & !(event.key.toLowerCase() == 'd')
         });
 
+        function sendUpdate(){
+            diffPose.x = 0
+            diffPose.y = 0
+            diffPose.y += dirDown ? 10:0
+            diffPose.y += dirUp ? -10:0
+            diffPose.x += dirRight ? 10:0
+            diffPose.x += dirLeft ? -10:0
+            console.log([dirDown, dirUp, dirRight, dirLeft])
+            socket.emit('keypressed', diffPose);
+
+        }
+
         window.setInterval(draw, 33);
+        window.setInterval(sendUpdate, 100);
 
         // New user connects.
         socket.on('newuser', (userid) => {
