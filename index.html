@@ -50,10 +50,16 @@
             const canvasCenter = [canvas.width / 2, canvas.height / 2]
             const camPos = [player.pose.x + mouseOffset[0]/2, player.pose.y + mouseOffset[1]/2]
             gridLines(camPos[0], camPos[1])
+            ctx.font = "12px Impact"
+            ctx.textAlign = "center"
             for (var playerId in gameState) {
-                ctx.fillStyle = gameState[playerId]["color"];
-                ctx.fillRect(canvasCenter[0] + gameState[playerId]["pose"]["x"] - camPos[0], 
-                            canvasCenter[1] + gameState[playerId]["pose"]["y"] - camPos[1], 
+                playerCanvasX = canvasCenter[0] + gameState[playerId]["pose"]["x"] - camPos[0]
+                playerCanvasY = canvasCenter[1] + gameState[playerId]["pose"]["y"] - camPos[1]
+                ctx.fillStyle = gameState[playerId]["color"];    
+                // draw "Test text" at X = 10 and Y = 30   
+                ctx.fillText(gameState[playerId]["name"], playerCanvasX + 20, playerCanvasY - 25);
+                ctx.fillRect(playerCanvasX, 
+                             playerCanvasY, 
                              40, 
                              40);
             }
