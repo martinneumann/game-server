@@ -10,6 +10,8 @@ import { Socket } from 'socket.io';
  * Types
  *******/
 
+const COLORS = ["red","blue","green", "orange", "purple"];
+
 interface Pose {
     x: number;
     y: number;
@@ -22,10 +24,12 @@ interface Pose {
 class Player {
     name: String; // Must be unique
     pose: Pose = { x: 3, y: 3, w: 3 };
+    color: String = COLORS[Math.floor(Math.random() * COLORS.length)];
+    socketId: String;
 
-
-    constructor(name: String) {
+    constructor(name: String, socketId: String) {
         this.name = name;
+        this.socketId = socketId;
     }
 }
 
@@ -35,6 +39,7 @@ class Player {
 // eslint-disable-next-line no-unused-vars
 class GameWorld {
     connectedClients: Array<Player> = [];
+    clientSockets: Map<String, Socket> = new Map<String, Socket>();
 
     /**
      * Changes a Player's pose based on the data that arrived.
@@ -62,12 +67,13 @@ class GameWorld {
      * Connects a new player.
      * Called when a new client connects to the server.
      */
-    connectPlayer(name: string): Player {
+    connectPlayer(name: String, socket: Socket): Player {
 
         /**
          * Add new player to connected player list
          */
-        const newPlayer: Player = new Player(name);
+        const newPlayer: Player = new Player(name, socket.id);
+        this.clientSockets.set(name, socket);
         this.connectedClients.push(newPlayer)
         const connectedPlayers = this.connectedClients.map(client => client.name)
         console.log(`Connected players: ${connectedPlayers}`)
@@ -107,17 +113,22 @@ io.on('connection', (socket: Socket) => {
     socket.emit('newuser', socket.id);
 
     console.log(`A user connected. Socket: ${socket.id} `);
-    gameWorld.connectPlayer(socket.id);
+    var newPlayer = gameWorld.connectPlayer(socket.id, socket);
+    console.log(`New Player: ${JSON.stringify(newPlayer)} `);
+
 
     socket.on('disconnect', () => {
         console.log(`user disconnected. Socket: ${socket.id}`);
     });
 
     socket.on('keypressed', (msg: Pose) => {
-        console.log(`player ${socket.id} sent pose: ${JSON.stringify(msg)}`);
+        var sendingPlayer = gameWorld.connectedClients.find(x => x.name == socket.id);
+        if (sendingPlayer != null){
+            gameWorld.updatePlayerPose(sendingPlayer, msg);
+        }
+        gameWorld.clientSockets.forEach((value: Socket) => {
+            value.emit('movement', gameWorld.connectedClients);
+        });
 
-        // gameWorld.updatePlayerPose(gameWorld.connectedClients.find(x => x.id == socket.id), msg);
-
-        socket.emit('movement',)
     });
 });

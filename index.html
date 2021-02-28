@@ -18,8 +18,7 @@
             }
         }
 
-        var currentPose = new Pose(0, 0, 0);
-        console.log(`Created pose: ${JSON.stringify(currentPose)}`);
+        var diffPose = new Pose(0, 0, 0);
         var socket = io();
 
         var canvas = document.getElementById('game');
@@ -27,28 +26,30 @@
 
         window.addEventListener('keydown', function (e) {
             e.preventDefault();
+            diffPose.x = 0;
+            diffPose.y = 0;
             switch (event.key) {
                 case 'w':
                 case 'W':
-                    currentPose.y = currentPose.y + 1;
+                    diffPose.y = -10;
                     break;
                 case 'a':
                 case 'A':
-                    currentPose.x = currentPose.x - 1;
+                    diffPose.x = -10;
                     break;
                 case 's':
                 case 'S':
-                    currentPose.y = currentPose.y - 1;
+                    diffPose.y = 10;
                     break;
                 case 'd':
                 case 'D':
-                    currentPose.x = currentPose.x + 1;
+                    diffPose.x = 10;
                     break;
                 default:
                     break;
             }
             if (event.key) {
-                socket.emit('keypressed', currentPose);
+                socket.emit('keypressed', diffPose);
                 event.key = '';
             }
         });
@@ -56,14 +57,18 @@
         // New user connects.
         socket.on('newuser', (userid) => {
             console.log(`New user ${userid} connected.`);
-            ctx.beginPath();
-            ctx.rect(20, 20, 150, 100);
-            ctx.stroke();
+            //ctx.beginPath();
+            ctx.fillRect(100, 100, 40, 40);
+            //ctx.fill();
         });
 
         // General key press or movement or whatever.
-        socket.on('keypressed', function (msg) {
-
+        socket.on('movement', function (msg) {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            for (var player in msg) {
+                ctx.fillStyle = msg[player]["color"];
+                ctx.fillRect(msg[player]["pose"]["x"], msg[player]["pose"]["y"], 40, 40);
+            }
         });
     </script>
 </body>
