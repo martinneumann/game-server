@@ -20,12 +20,12 @@ interface Pose {
  * Player object that contains relevant data for a connected actor
  */
 class Player {
-    id: String; // Must be unique
-    pose: Pose;
+    name: String; // Must be unique
+    pose: Pose = { x: 3, y: 3, w: 3 };
 
 
     constructor(name: String) {
-        this.id = name;
+        this.name = name;
     }
 }
 
@@ -35,22 +35,6 @@ class Player {
 // eslint-disable-next-line no-unused-vars
 class GameWorld {
     connectedClients: Array<Player> = [];
-
-    /**
-     * Called when a client sends new data, e.g. their pose.
-     * @param sendingPlayer The player sending the data.
-     * @param data The data package.
-     * 
-     */
-    public updateGameInfo(sendingPlayer: Player, data: Pose) {
-        console.log(`Updating game data.`);
-        const foundPlayer = this.connectedClients.find(player => player.id === sendingPlayer.id);
-        if (foundPlayer !== undefined) {
-            foundPlayer.pose = data;
-        } else {
-            console.error(`Error while updating game info:`, `Tried to update an unknown player's pose.`);
-        }
-    }
 
     /**
      * Changes a Player's pose based on the data that arrived.
@@ -78,8 +62,18 @@ class GameWorld {
      * Connects a new player.
      * Called when a new client connects to the server.
      */
-    connectPlayer(name: string) {
-        this.connectedClients.push(new Player(name))
+    connectPlayer(name: string): Player {
+
+        /**
+         * Add new player to connected player list
+         */
+        const newPlayer: Player = new Player(name);
+        this.connectedClients.push(newPlayer)
+        const connectedPlayers = this.connectedClients.map(client => client.name)
+        console.log(`Connected players: ${connectedPlayers}`)
+
+
+        return newPlayer;
     }
 
     /**
@@ -87,7 +81,8 @@ class GameWorld {
      * @param disconnectingPlayer The disconnecting player.
      */
     disconnectPlayer(disconnectingPlayer: Player) {
-        this.connectedClients.filter(player => player !== disconnectingPlayer);
+        this.connectedClients = this.connectedClients.filter(player => player !== disconnectingPlayer);
+        console.log(`Connected clients are: ${this.connectedClients.map(client => client.name)}`)
     }
 }
 
@@ -96,7 +91,7 @@ const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
-app.get('/', (req, res) => {
+app.get('/', (req: any, res: { sendFile: (arg0: string) => void; }) => {
     res.sendFile(__dirname + '/index.html');
 });
 
@@ -118,10 +113,10 @@ io.on('connection', (socket: Socket) => {
         console.log(`user disconnected. Socket: ${socket.id}`);
     });
 
-    socket.on('keypressed', (msg) => {
+    socket.on('keypressed', (msg: Pose) => {
         console.log(`player ${socket.id} sent pose: ${JSON.stringify(msg)}`);
 
-        gameWorld.updatePlayerPose(gameWorld.connectedClients.find(x => x.id == socket.id), msg);
+        // gameWorld.updatePlayerPose(gameWorld.connectedClients.find(x => x.id == socket.id), msg);
 
         socket.emit('movement',)
     });

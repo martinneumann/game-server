@@ -4,8 +4,11 @@
   "description": "A server for a game maker game.",
   "main": "index.js",
   "scripts": {
+    "init": "tsc --init",
     "start": "node ./dist/index.js",
-    "build": "./node_modules/.bin/eslint index.ts && tsc --outDir ./dist index.ts && cp index.html ./dist/index.html",
+    "start:client": "node ./dist/testclient/testclient.js",
+    "start:client2": "node ./dist/testclient/testclient2.js",
+    "build": "./node_modules/.bin/eslint index.ts && tsc --outDir ./dist index.ts ./testclient/testclient.ts ./testclient/testclient2.ts",
     "test": "test"
   },
   "repository": {
@@ -20,10 +23,13 @@
   "homepage": "https://github.com/martinneumann/game-server#readme",
   "dependencies": {
     "@types/node": "^13.13.0",
+    "@types/uuid": "^7.0.3",
     "express": "^4.17.1",
     "net": "^1.0.2",
+    "rxjs": "^6.5.5",
     "socket.io": "^3.1.2",
     "typescript": "^3.8.3",
+    "uuid": "^7.0.3",
     "uuidv4": "^6.0.7"
   },
   "devDependencies": {
