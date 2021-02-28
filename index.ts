@@ -10,7 +10,7 @@ import { Socket } from 'socket.io';
  * Types
  *******/
 
-const COLORS = ["red","blue","green", "orange", "purple"];
+const COLORS = ["red", "blue", "green", "orange", "purple"];
 
 interface Pose {
     x: number;
@@ -33,9 +33,9 @@ class Player {
     }
 }
 
-function mapToJSON(map: Map<string, Object>): string{
-    let jsonObj: {[key: string]: Object} = {};
-    map.forEach((value: Object, key: string) =>{
+function mapToJSON(map: Map<string, Object>): string {
+    let jsonObj: { [key: string]: Object } = {};
+    map.forEach((value: Object, key: string) => {
         jsonObj[key] = value;
     })
     return JSON.stringify(jsonObj);
@@ -87,6 +87,11 @@ class GameWorld {
     }
 
     /**
+    private authenticatePlayer(name: string, password: string): bool {
+
+    } */
+
+    /**
      * Removes a player from the client list.
      * @param disconnectingPlayer The disconnecting player.
      */
@@ -128,7 +133,7 @@ io.on('connection', (socket: Socket) => {
 
     socket.on('keypressed', (msg: Pose) => {
         var sendingPlayer = gameWorld.connectedClients.get(socket.id);
-        if (sendingPlayer != null){
+        if (sendingPlayer != null) {
             gameWorld.updatePlayerPose(sendingPlayer, msg);
         }
         gameWorld.clientSockets.forEach((value: Socket) => {
