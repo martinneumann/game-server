@@ -107,25 +107,46 @@
         var canvas = document.getElementById('game');
         var ctx = canvas.getContext("2d");
 
-        window.addEventListener('mousemove', function (e) {
-            mouseOffset = [e.offsetX - canvas.width / 2, e.offsetY - canvas.height / 2];
+        canvas.addEventListener('mouseover', function (e){
+            addCanvasEventListeners();
         })
 
-        window.addEventListener('keydown', function (e) {
+        canvas.addEventListener('mouseout', function (e){
+            removeCanvasEventListeners();
+        })
+
+        function addCanvasEventListeners() {
+            window.addEventListener('mousemove', mousemoveEventListener);
+            window.addEventListener('keydown', keydownEventListener);
+            window.addEventListener('keyup', keyupEventListener);
+        }
+
+        function removeCanvasEventListeners() {
+            window.removeEventListener('mousemove', mousemoveEventListener);
+            window.removeEventListener('keydown', keydownEventListener);
+            window.removeEventListener('keyup', keyupEventListener);
+        }
+
+        function mousemoveEventListener(e){
+            mouseOffset = [e.offsetX - canvas.width / 2, e.offsetY - canvas.height / 2];
+        }
+
+
+        function keydownEventListener(e) {
             e.preventDefault();
             dirUp = dirUp | (event.key.toLowerCase() == 'w')
             dirDown = dirDown | (event.key.toLowerCase() == 's')
             dirLeft = dirLeft | (event.key.toLowerCase() == 'a')
             dirRight = dirRight | (event.key.toLowerCase() == 'd')
-        })
+        }
 
-        window.addEventListener('keyup', function (e) {
+        function keyupEventListener (e) {
             e.preventDefault();
             dirUp = dirUp & !(event.key.toLowerCase() == 'w')
             dirDown = dirDown & !(event.key.toLowerCase() == 's')
             dirLeft = dirLeft & !(event.key.toLowerCase() == 'a')
             dirRight = dirRight & !(event.key.toLowerCase() == 'd')
-        });
+        };
 
         function sendUpdate() {
             diffPose.x = 0
