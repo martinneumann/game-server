@@ -20,6 +20,9 @@
 
         var diffPose = new Pose(0, 0, 0);
         var socket = io();
+        var userId = "";
+        var playerX = 0;
+        var playerY = 0;
 
         var canvas = document.getElementById('game');
         var ctx = canvas.getContext("2d");
@@ -57,6 +60,7 @@
         // New user connects.
         socket.on('newuser', (userid) => {
             console.log(`New user ${userid} connected.`);
+            userId = userid;
             //ctx.beginPath();
             ctx.fillRect(100, 100, 40, 40);
             //ctx.fill();
@@ -64,10 +68,18 @@
 
         // General key press or movement or whatever.
         socket.on('movement', function (msg) {
+            msg = JSON.parse(msg)
+            playerX = msg[userId]["pose"]["x"]
+            playerY = msg[userId]["pose"]["y"]
             ctx.clearRect(0,0,canvas.width, canvas.height);
             for (var player in msg) {
                 ctx.fillStyle = msg[player]["color"];
-                ctx.fillRect(msg[player]["pose"]["x"], msg[player]["pose"]["y"], 40, 40);
+                if (player == userId){
+                    ctx.fillRect(400, 400, 40, 40);
+                    continue;
+                }
+                ctx.fillStyle = msg[player]["color"];
+                ctx.fillRect(400 + msg[player]["pose"]["x"] - playerX, 400 + msg[player]["pose"]["y"] - playerY, 40, 40);
             }
         });
     </script>

@@ -22,24 +22,31 @@ interface Pose {
  * Player object that contains relevant data for a connected actor
  */
 class Player {
-    name: String; // Must be unique
+    name: string; // Must be unique
     pose: Pose = { x: 3, y: 3, w: 3 };
-    color: String = COLORS[Math.floor(Math.random() * COLORS.length)];
-    socketId: String;
+    color: string = COLORS[Math.floor(Math.random() * COLORS.length)];
+    socketId: string;
 
-    constructor(name: String, socketId: String) {
+    constructor(name: string, socketId: string) {
         this.name = name;
         this.socketId = socketId;
     }
 }
 
+function mapToJSON(map: Map<string, Object>): string{
+    let jsonObj: {[key: string]: Object} = {};
+    map.forEach((value: Object, key: string) =>{
+        jsonObj[key] = value;
+    })
+    return JSON.stringify(jsonObj);
+}
 /**
  * Main server class.
  */
 // eslint-disable-next-line no-unused-vars
 class GameWorld {
-    connectedClients: Array<Player> = [];
-    clientSockets: Map<String, Socket> = new Map<String, Socket>();
+    connectedClients: Map<string, Player> = new Map<string, Player>();
+    clientSockets: Map<string, Socket> = new Map<string, Socket>();
 
     /**
      * Changes a Player's pose based on the data that arrived.
@@ -67,17 +74,15 @@ class GameWorld {
      * Connects a new player.
      * Called when a new client connects to the server.
      */
-    connectPlayer(name: String, socket: Socket): Player {
+    connectPlayer(name: string, socket: Socket): Player {
 
         /**
          * Add new player to connected player list
          */
-        const newPlayer: Player = new Player(name, socket.id);
+        var newPlayer: Player = new Player(name, socket.id);
         this.clientSockets.set(name, socket);
-        this.connectedClients.push(newPlayer)
-        const connectedPlayers = this.connectedClients.map(client => client.name)
-        console.log(`Connected players: ${connectedPlayers}`)
-
+        this.connectedClients.set(name, newPlayer);
+        console.log(`Connected clients are: ${this.connectedClients}`)
 
         return newPlayer;
     }
@@ -86,9 +91,9 @@ class GameWorld {
      * Removes a player from the client list.
      * @param disconnectingPlayer The disconnecting player.
      */
-    disconnectPlayer(disconnectingPlayer: Player) {
-        this.connectedClients = this.connectedClients.filter(player => player !== disconnectingPlayer);
-        console.log(`Connected clients are: ${this.connectedClients.map(client => client.name)}`)
+    disconnectPlayer(disconnectingPlayerId: string) {
+        this.connectedClients.delete(disconnectingPlayerId);
+        console.log(`Connected clients are: ${mapToJSON(this.connectedClients)}`)
     }
 }
 
@@ -119,15 +124,16 @@ io.on('connection', (socket: Socket) => {
 
     socket.on('disconnect', () => {
         console.log(`user disconnected. Socket: ${socket.id}`);
+        gameWorld.disconnectPlayer(socket.id);
     });
 
     socket.on('keypressed', (msg: Pose) => {
-        var sendingPlayer = gameWorld.connectedClients.find(x => x.name == socket.id);
+        var sendingPlayer = gameWorld.connectedClients.get(socket.id);
         if (sendingPlayer != null){
             gameWorld.updatePlayerPose(sendingPlayer, msg);
         }
         gameWorld.clientSockets.forEach((value: Socket) => {
-            value.emit('movement', gameWorld.connectedClients);
+            value.emit('movement', mapToJSON(gameWorld.connectedClients));
         });
 
     });
