@@ -141,4 +141,13 @@ io.on('connection', (socket: Socket) => {
         });
 
     });
+
+    socket.on('login', (msg: any) => {
+        console.log(`Received login message: ${JSON.stringify(msg)}`);
+    });
+
+
+    socket.on('register', (msg: any) => {
+        console.log(`Received register message: ${JSON.stringify(msg)}`);
+    });
 });

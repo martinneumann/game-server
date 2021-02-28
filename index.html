@@ -22,8 +22,8 @@
         <div>
             <h1>Hi, please log in or register.</h1>
             <form>
-                <input>
-                <input type="password">
+                <input id="name1" value="Username">
+                <input id="pwd1" type="password">
                 <button type="button" onclick="login()">Log in</button>
             </form>
         </div>
@@ -31,15 +31,14 @@
             <h2>Or register, I don't care.</h2>
             <form>
                 <input>
-                <input type="password">
-                <button type="button" onclick="register()">Register</button>
+                <input id="name2" value="Username" type="password">
+                <button id="pwd2" type="button" onclick="register()">Register</button>
             </form>
         </div>
     </div>
     <script src="/socket.io/socket.io.js"></script>
     <script>
 
-        addeventlisteners();
         class Pose {
             x;
             y;
@@ -111,7 +110,46 @@
         var canvas = document.getElementById('game');
         var ctx = canvas.getContext("2d");
 
+        canvas.addEventListener('mouseover', function (e) {
+            addCanvasEventListeners();
+        })
 
+        canvas.addEventListener('mouseout', function (e) {
+            removeCanvasEventListeners();
+        })
+
+        function addCanvasEventListeners() {
+            window.addEventListener('mousemove', mousemoveEventListener);
+            window.addEventListener('keydown', keydownEventListener);
+            window.addEventListener('keyup', keyupEventListener);
+        }
+
+        function removeCanvasEventListeners() {
+            window.removeEventListener('mousemove', mousemoveEventListener);
+            window.removeEventListener('keydown', keydownEventListener);
+            window.removeEventListener('keyup', keyupEventListener);
+        }
+
+        function mousemoveEventListener(e) {
+            mouseOffset = [e.offsetX - canvas.width / 2, e.offsetY - canvas.height / 2];
+        }
+
+
+        function keydownEventListener(e) {
+            e.preventDefault();
+            dirUp = dirUp | (event.key.toLowerCase() == 'w')
+            dirDown = dirDown | (event.key.toLowerCase() == 's')
+            dirLeft = dirLeft | (event.key.toLowerCase() == 'a')
+            dirRight = dirRight | (event.key.toLowerCase() == 'd')
+        }
+
+        function keyupEventListener(e) {
+            e.preventDefault();
+            dirUp = dirUp & !(event.key.toLowerCase() == 'w')
+            dirDown = dirDown & !(event.key.toLowerCase() == 's')
+            dirLeft = dirLeft & !(event.key.toLowerCase() == 'a')
+            dirRight = dirRight & !(event.key.toLowerCase() == 'd')
+        };
 
         function sendUpdate() {
             diffPose.x = 0
@@ -145,17 +183,24 @@
         });
 
         // Log in
-        function login(name, pwd) {
+        function login() {
+            var name = document.getElementById("name1").value
+            var pwd = document.getElementById("pwd1").value
             console.log(name)
             console.log(pwd)
 
+            socket.emit('login', { name, pwd })
 
         }
 
         // register
-        function register(name, pwd) {
+        function register() {
+            var name = document.getElementById("name2").value
+            var pwd = document.getElementById("pwd2").value
             console.log(name)
             console.log(pwd)
+
+            socket.emit('register', { name, pwd })
 
         }
 
