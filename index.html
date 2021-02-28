@@ -28,8 +28,8 @@
         }
 
         function gridLines(GlobalOffsetX, GlobalOffsetY, cellWidth = 64, lineWidth = 2){
-            offsetX = GlobalOffsetX%(cellWidth * 2)
-            offsetY = GlobalOffsetY%(cellWidth * 2)
+            offsetX = GlobalOffsetX%cellWidth
+            offsetY = GlobalOffsetY%cellWidth
             swapColors = offsetX > cellWidth & offsetY > cellWidth
             numCellsX = Math.ceil(canvas.width / cellWidth) + 1
             numCellsY = Math.ceil(canvas.height / cellWidth) + 1
@@ -105,7 +105,6 @@
             diffPose.y += dirUp ? -10:0
             diffPose.x += dirRight ? 10:0
             diffPose.x += dirLeft ? -10:0
-            console.log([dirDown, dirUp, dirRight, dirLeft])
             socket.emit('keypressed', diffPose);
 
         }
