@@ -4,20 +4,6 @@ import { Socket } from 'socket.io';
 /**
  * Central server because I'm lazy.
  * @author Martin Neumann
- * 
- * @description
- * Messages contain:
- * - sender
- * - messagePurpose
- * - payload
- * 
- * Payload may be:
- * - string (chat message)
- * - pose (x, y, w)
- * 
- * @todo
- * - unique player Ids instead of names
- * - use promises for everything instead of crashing
  */
 
 /*******
@@ -44,48 +30,11 @@ class Player {
 }
 
 /**
- * Chat Message type
- */
-interface ChatMessage {
-    content: String;
-    from: String;
-    to?: String;
-
-}
-
-
-/**
  * Main server class.
  */
 // eslint-disable-next-line no-unused-vars
 class GameWorld {
     connectedClients: Array<Player> = [];
-
-    /**
-     * Parses the received data from the client.
-     * @param data Received data as a string, in JSON format. Data has the following format:
-     * messagePurpose: pose, chat, newplayer
-     */
-    private parseData(data: string) {
-        const dataAsJson = JSON.parse(data);
-        switch (dataAsJson.messagePurpose) {
-            case 'pose':
-                this.updateGameInfo(this.connectedClients.find(client => client.id === dataAsJson.sender), dataAsJson.payload)
-                break;
-            case 'chat':
-                this.broadcastChatMessage(dataAsJson.payload);
-                break;
-            case 'newplayer':
-                console.log(`Player ${dataAsJson.payload} connected!`);
-                this.connectPlayer(dataAsJson.payload);
-                break;
-            default:
-                console.error(`Error while parsing a client's message`, `Unknown message purpose`);
-                return;
-
-
-        }
-    }
 
     /**
      * Called when a client sends new data, e.g. their pose.
@@ -101,6 +50,19 @@ class GameWorld {
         } else {
             console.error(`Error while updating game info:`, `Tried to update an unknown player's pose.`);
         }
+    }
+
+    /**
+     * Changes a Player's pose based on the data that arrived.
+     * @param sendingPlayer 
+     * @param difference 
+     */
+    public updatePlayerPose(sendingPlayer: Player, difference: Pose) {
+        console.log(`Updating player pose by ${JSON.stringify(difference)}.`);
+        sendingPlayer.pose.x += difference.x;
+        sendingPlayer.pose.y += difference.y;
+        sendingPlayer.pose.w += difference.w;
+
     }
 
     /**
@@ -157,17 +119,10 @@ io.on('connection', (socket: Socket) => {
     });
 
     socket.on('keypressed', (msg) => {
-        console.log(`player ${socket.id} pressed key: ` + msg);
+        console.log(`player ${socket.id} sent pose: ${JSON.stringify(msg)}`);
 
-        switch (msg) {
-            case 'a':
-            case 'A':
-                gameWorld.updateGameInfo(gameWorld.connectedClients.find(x => x.id == socket.id), { x: 1, y: 2, w: 90 });
-                break;
-            default:
-                console.log(`Command not valid.`);
+        gameWorld.updatePlayerPose(gameWorld.connectedClients.find(x => x.id == socket.id), msg);
 
-        }
         socket.emit('movement',)
     });
 });

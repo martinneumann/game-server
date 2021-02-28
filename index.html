@@ -6,6 +6,20 @@
     </canvas>
     <script src="/socket.io/socket.io.js"></script>
     <script>
+
+        class Pose {
+            x;
+            y;
+            w;  // orientation in whatever unit game maker provides
+            constructor(x, y, w) {
+                this.x = x;
+                this.w = w;
+                this.y = y;
+            }
+        }
+
+        var currentPose = new Pose(0, 0, 0);
+        console.log(`Created pose: ${JSON.stringify(currentPose)}`);
         var socket = io();
 
         var canvas = document.getElementById('game');
@@ -13,8 +27,28 @@
 
         window.addEventListener('keydown', function (e) {
             e.preventDefault();
+            switch (event.key) {
+                case 'w':
+                case 'W':
+                    currentPose.x = currentPose.y + 1;
+                    break;
+                case 'a':
+                case 'A':
+                    currentPose.x = currentPose.x - 1;
+                    break;
+                case 's':
+                case 'S':
+                    currentPose.x = currentPose.y - 1;
+                    break;
+                case 'd':
+                case 'D':
+                    currentPose.x = currentPose.x + 1;
+                    break;
+                default:
+                    break;
+            }
             if (event.key) {
-                socket.emit('keypressed', event.key);
+                socket.emit('keypressed', currentPose);
                 event.key = '';
             }
         });
