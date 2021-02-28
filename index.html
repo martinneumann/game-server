@@ -1,156 +1,173 @@
-<header>
-    <link rel="stylesheet" href="style.css">
-</header>
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
 
 <body>
-    <div class="box">
-        <canvas id="game" width="1024" height="768">
+    <canvas class="canvas" id="game" width="1024" height="768" style=" padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;">
 
-        </canvas>
-        <script src="/socket.io/socket.io.js"></script>
-        <script>
-
-            class Pose {
-                x;
-                y;
-                w;  // orientation in whatever unit game maker provides
-                constructor(x, y, w) {
-                    this.x = x;
-                    this.w = w;
-                    this.y = y;
-                }
-            }
-
-            class PlayerState {
-                id;
-                pose;
-                constructor(id, pose) {
-                    this.id = id;
-                    this.pose = pose;
-                }
-            }
-
-            function gridLines(GlobalOffsetX, GlobalOffsetY, cellWidth = 64, lineWidth = 2) {
-                offsetX = GlobalOffsetX % (cellWidth * 2)
-                offsetY = GlobalOffsetY % (cellWidth * 2)
-                swapColors = offsetX > cellWidth & offsetY > cellWidth
-                numCellsX = Math.ceil(canvas.width / cellWidth) + 1
-                numCellsY = Math.ceil(canvas.height / cellWidth) + 1
-                ctx.fillStyle = "#222222"
-                for (let i = -1; i < numCellsX; i++) {
-                    ctx.fillRect(i * cellWidth - offsetX, 0,
-                        lineWidth, canvas.height)
-                }
-                for (let i = -1; i < numCellsY; i++) {
-                    ctx.fillRect(0, i * cellWidth - offsetY,
-                        canvas.width, lineWidth)
-                }
-            }
-
-            function draw() {
-                //ctx.fillStyle = "#222222"
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                const canvasCenter = [canvas.width / 2, canvas.height / 2]
-                const camPos = [player.pose.x + mouseOffset[0] / 2, player.pose.y + mouseOffset[1] / 2]
-                gridLines(camPos[0], camPos[1])
-                for (var playerId in gameState) {
-                    ctx.fillStyle = gameState[playerId]["color"];
-                    ctx.fillRect(canvasCenter[0] + gameState[playerId]["pose"]["x"] - camPos[0],
-                        canvasCenter[1] + gameState[playerId]["pose"]["y"] - camPos[1],
-                        40,
-                        40);
-                }
-            }
-
-            var diffPose = new Pose(0, 0, 0);
-            var socket = io();
-            var player;
-            var mouseOffset = (0, 0);
-            var gameState;
-
-            var canvas = document.getElementById('game');
-            var ctx = canvas.getContext("2d");
-
-            window.addEventListener('mousemove', function (e) {
-                mouseOffset = [e.offsetX - canvas.width / 2, e.offsetY - canvas.height / 2];
-            })
-
-            window.addEventListener('keydown', function (e) {
-                e.preventDefault();
-                diffPose.x = 0;
-                diffPose.y = 0;
-                switch (event.key) {
-                    case 'w':
-                    case 'W':
-                        diffPose.y = -10;
-                        break;
-                    case 'a':
-                    case 'A':
-                        diffPose.x = -10;
-                        break;
-                    case 's':
-                    case 'S':
-                        diffPose.y = 10;
-                        break;
-                    case 'd':
-                    case 'D':
-                        diffPose.x = 10;
-                        break;
-                    default:
-                        break;
-                }
-                if (event.key) {
-                    socket.emit('keypressed', diffPose);
-                    event.key = '';
-                }
-            });
-
-            window.setInterval(draw, 33);
-
-            // New user connects.
-            socket.on('newuser', (userid) => {
-                console.log(`New user ${userid} connected.`);
-
-                document.getElementById('login').hidden = false;
-
-                // Log in/register.
-                player = new PlayerState(userid, new Pose(0, 0, 0));
-            });
-
-            // General key press or movement or whatever.
-            socket.on('movement', function (msg) {
-                gameState = JSON.parse(msg)
-                player.pose.x = gameState[player.id]["pose"]["x"]
-                player.pose.y = gameState[player.id]["pose"]["y"]
-            });
-
-            // Log in
-            function login(name, pwd) {
-
-            }
-
-            // register
-            function register(name, pwd) {
-
-            }
-
-        </script>
-        <div id="login" hidden
-            style="position: absolute; margin: 0 auto; bottom: 30px; left: 50%; right: 50%; width: 400px; height: 300px">
-            <div>
-                <h1>Hi, please log in or register.</h1>
-                <form>
-                    <input>
-                    <input type="password">
-                </form>
-            </div>
-            <div>
-                <h2>Or register, I don't care.</h2>
-                <form>
-                    <input>
-                    <input type="password">
-                </form>
-            </div>
+    </canvas>
+    <div id="login" hidden style="position: absolute; 
+           padding-right: 0;
+    margin-left: 0;
+    margin-right: auto;
+        
+       ">
+        <div>
+            <h1>Hi, please log in or register.</h1>
+            <form>
+                <input>
+                <input type="password">
+            </form>
+        </div>
+        <div>
+            <h2>Or register, I don't care.</h2>
+            <form>
+                <input>
+                <input type="password">
+            </form>
         </div>
     </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        class Pose {
+            x;
+            y;
+            w;  // orientation in whatever unit game maker provides
+            constructor(x, y, w) {
+                this.x = x;
+                this.w = w;
+                this.y = y;
+            }
+        }
+
+        class PlayerState {
+            id;
+            pose;
+            constructor(id, pose) {
+                this.id = id;
+                this.pose = pose;
+            }
+        }
+
+        function gridLines(GlobalOffsetX, GlobalOffsetY, cellWidth = 64, lineWidth = 2) {
+            offsetX = GlobalOffsetX % cellWidth
+            offsetY = GlobalOffsetY % cellWidth
+            swapColors = offsetX > cellWidth & offsetY > cellWidth
+            numCellsX = Math.ceil(canvas.width / cellWidth) + 1
+            numCellsY = Math.ceil(canvas.height / cellWidth) + 1
+            ctx.fillStyle = "#222222"
+            for (let i = -1; i < numCellsX; i++) {
+                ctx.fillRect(i * cellWidth - offsetX, 0,
+                    lineWidth, canvas.height)
+            }
+            for (let i = -1; i < numCellsY; i++) {
+                ctx.fillRect(0, i * cellWidth - offsetY,
+                    canvas.width, lineWidth)
+            }
+        }
+
+        function draw() {
+            //ctx.fillStyle = "#222222"
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const canvasCenter = [canvas.width / 2, canvas.height / 2]
+            const camPos = [player.pose.x + mouseOffset[0] / 2, player.pose.y + mouseOffset[1] / 2]
+            gridLines(camPos[0], camPos[1])
+            ctx.font = "12px Impact"
+            ctx.textAlign = "center"
+            for (var playerId in gameState) {
+                playerCanvasX = canvasCenter[0] + gameState[playerId]["pose"]["x"] - camPos[0]
+                playerCanvasY = canvasCenter[1] + gameState[playerId]["pose"]["y"] - camPos[1]
+                ctx.fillStyle = gameState[playerId]["color"];
+                // draw "Test text" at X = 10 and Y = 30   
+                ctx.fillText(gameState[playerId]["name"], playerCanvasX + 20, playerCanvasY - 25);
+                ctx.fillRect(playerCanvasX,
+                    playerCanvasY,
+                    40,
+                    40);
+            }
+        }
+
+        var diffPose = new Pose(0, 0, 0);
+        var socket = io();
+        var player;
+        var mouseOffset = (0, 0);
+        var gameState;
+        var dirUp = false;
+        var dirDown = false;
+        var dirLeft = false;
+        var dirRight = false;
+
+        var canvas = document.getElementById('game');
+        var ctx = canvas.getContext("2d");
+
+        window.addEventListener('mousemove', function (e) {
+            mouseOffset = [e.offsetX - canvas.width / 2, e.offsetY - canvas.height / 2];
+        })
+
+        window.addEventListener('keydown', function (e) {
+            e.preventDefault();
+            dirUp = dirUp | (event.key.toLowerCase() == 'w')
+            dirDown = dirDown | (event.key.toLowerCase() == 's')
+            dirLeft = dirLeft | (event.key.toLowerCase() == 'a')
+            dirRight = dirRight | (event.key.toLowerCase() == 'd')
+        })
+
+        window.addEventListener('keyup', function (e) {
+            e.preventDefault();
+            dirUp = dirUp & !(event.key.toLowerCase() == 'w')
+            dirDown = dirDown & !(event.key.toLowerCase() == 's')
+            dirLeft = dirLeft & !(event.key.toLowerCase() == 'a')
+            dirRight = dirRight & !(event.key.toLowerCase() == 'd')
+        });
+
+        function sendUpdate() {
+            diffPose.x = 0
+            diffPose.y = 0
+            diffPose.y += dirDown ? 10 : 0
+            diffPose.y += dirUp ? -10 : 0
+            diffPose.x += dirRight ? 10 : 0
+            diffPose.x += dirLeft ? -10 : 0
+            socket.emit('keypressed', diffPose);
+
+        }
+
+        window.setInterval(draw, 33);
+        window.setInterval(sendUpdate, 100);
+
+        // New user connects.
+        socket.on('newuser', (userid) => {
+            console.log(`New user ${userid} connected.`);
+
+            document.getElementById("login").hidden = false;
+            player = new PlayerState(userid, new Pose(0, 0, 0));
+        });
+
+        // General key press or movement or whatever.
+        socket.on('movement', function (msg) {
+            gameState = JSON.parse(msg)
+            player.pose.x = gameState[player.id]["pose"]["x"]
+            player.pose.y = gameState[player.id]["pose"]["y"]
+        });
+
+        // Log in
+        function login(name, pwd) {
+
+        }
+
+        // register
+        function register(name, pwd) {
+
+        }
+
+    </script>
+
 </body>
+
+</html>
