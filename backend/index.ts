@@ -106,11 +106,13 @@ const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
+app.use(express.static('frontend/build'));
+app.use(express.static('frontend/css'));
+
 app.get('/', (req: any, res: { sendFile: (arg0: string) => void; }) => {
     res.sendFile(__dirname + '/index.html');
 });
 
-app.use(express.static('styles.css'));
 
 console.log(`Creating game world...`);
 const gameWorld = new GameWorld();
@@ -146,10 +148,14 @@ io.on('connection', (socket: Socket) => {
 
     socket.on('login', (msg: any) => {
         console.log(`Received login message: ${JSON.stringify(msg)}`);
+        gameWorld.connectPlayer(msg["name"], socket);
+        socket.emit('loginsuccessful', msg["name"]);
     });
 
 
     socket.on('register', (msg: any) => {
         console.log(`Received register message: ${JSON.stringify(msg)}`);
+        gameWorld.connectPlayer(msg["name"], socket);
+        socket.emit('registersuccessful', msg["name"]);
     });
 });

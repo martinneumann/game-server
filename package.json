@@ -6,9 +6,7 @@
   "scripts": {
     "init": "tsc --init",
     "start": "node ./dist/index.js",
-    "start:client": "node ./dist/testclient/testclient.js",
-    "start:client2": "node ./dist/testclient/testclient2.js",
-    "build": "./node_modules/.bin/eslint ./backend/index.ts && tsc --outDir ./dist backend/index.ts && cp ./frontend/index.html ./dist/index.html && cp ./frontend/styles.css ./dist/styles.css",
+    "build": "./node_modules/.bin/eslint ./backend/index.ts && tsc --outDir ./dist backend/index.ts && tsc --outDir ./frontend/build frontend/canvas.ts && cp ./frontend/index.html ./dist/index.html && cp ./frontend/css/styles.css ./dist/styles.css",
     "test": "test"
   },
   "repository": {
@@ -23,13 +21,17 @@
   "homepage": "https://github.com/martinneumann/game-server#readme",
   "dependencies": {
     "@types/node": "^13.13.0",
+    "@types/socket.io-client": "^1.4.35",
     "@types/uuid": "^7.0.3",
     "express": "^4.17.1",
+    "i": "^0.3.6",
     "mongodb": "^3.6.4",
     "net": "^1.0.2",
+    "npm": "^7.6.0",
     "pixi.js": "^5.3.8",
-    "rxjs": "^6.5.5",
+    "rxjs": "^6.6.6",
     "socket.io": "^3.1.2",
+    "socket.io-client": "^3.1.2",
     "typescript": "^3.8.3",
     "uuid": "^7.0.3",
     "uuidv4": "^6.0.7",
