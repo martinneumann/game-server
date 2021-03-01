@@ -1,9 +1,0 @@
-{                                                                               
-    "sender": "Dudebro",
-    "messagePurpose": "pose",                                                   
-    "payload": {                                                                
-        "x": 100,                                                            
-        "y": 100,                                                              
-        "w": 1
-    }                                                                              
-}                                                                                  

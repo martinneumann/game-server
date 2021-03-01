@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 import { Socket } from 'socket.io';
+import * as express from 'express';
 
 /**
  * Central server because I'm lazy.
@@ -54,7 +55,6 @@ class GameWorld {
      * @param difference 
      */
     public updatePlayerPose(sendingPlayer: Player, difference: Pose) {
-        console.log(`Updating player pose by ${JSON.stringify(difference)}.`);
         sendingPlayer.pose.x += difference.x;
         sendingPlayer.pose.y += difference.y;
         sendingPlayer.pose.w += difference.w;
@@ -109,6 +109,8 @@ const io = require('socket.io')(http);
 app.get('/', (req: any, res: { sendFile: (arg0: string) => void; }) => {
     res.sendFile(__dirname + '/index.html');
 });
+
+app.use(express.static('styles.css'));
 
 console.log(`Creating game world...`);
 const gameWorld = new GameWorld();
