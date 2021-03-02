@@ -47,6 +47,7 @@ function gridLines(GlobalOffsetX, GlobalOffsetY, cellWidth, lineWidth) {
     }
 }
 function draw() {
+    var _a, _b, _c, _d;
     //ctx.fillStyle = "#222222"
     if (ctx != undefined && player != undefined) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -55,14 +56,14 @@ function draw() {
         gridLines(camPos[0], camPos[1]);
         ctx.font = "12px Impact";
         ctx.textAlign = "center";
-        if (ctx != undefined) {
+        if (ctx != undefined && gameState != undefined) {
             for (var playerId in gameState) {
-                var playerCanvasX = canvasCenter[0] + gameState[playerId]["pose"]["x"] - camPos[0];
-                var playerCanvasY = canvasCenter[1] + gameState[playerId]["pose"]["y"] - camPos[1];
+                var playerCanvasX = canvasCenter[0] + ((_b = (_a = gameState.playerId) === null || _a === void 0 ? void 0 : _a.pose) === null || _b === void 0 ? void 0 : _b.x) - camPos[0];
+                var playerCanvasY = canvasCenter[1] + ((_d = (_c = gameState.playerId) === null || _c === void 0 ? void 0 : _c.pose) === null || _d === void 0 ? void 0 : _d.y) - camPos[1];
                 /**
                  * @todo: check gameState objects.
                  **/
-                ctx.fillStyle = gameState[playerId]["color"]["x"];
+                ctx.fillStyle = gameState.playerId.color.x;
                 // draw "Test text" at X = 10 and Y = 30   
                 ctx.fillText(gameState["playerId"]["name"]["x"], playerCanvasX + 20, playerCanvasY - 25);
                 ctx.fillRect(playerCanvasX, playerCanvasY, 40, 40);
@@ -137,6 +138,7 @@ socket.on('newuser', function (userid) {
 });
 // General key press or movement or whatever.
 socket.on('movement', function (msg) {
+    console.log(JSON.stringify(msg));
     gameState = JSON.parse(msg);
     if (player != undefined) {
         player.pose.x = gameState[player.id]["pose"]["x"];

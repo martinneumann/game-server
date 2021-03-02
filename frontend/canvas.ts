@@ -1,5 +1,8 @@
 const socketio = require("socket.io-client");
 
+/**
+ * Pose type.
+ */
 class Pose {
     x;
     y;
@@ -11,15 +14,21 @@ class Pose {
     }
 }
 
+/**
+ * State of a player's character. Only pose for now.
+ */
 class PlayerState {
-    id;
-    pose;
-    constructor(id: any, pose: Pose) {
+    id: string;
+    pose: Pose;
+    constructor(id: string, pose: Pose) {
         this.id = id;
         this.pose = pose;
     }
 }
 
+/**
+ * Sets up the canvas according to screen size.
+ */
 function setUpCanvas() {
     const canvas = <HTMLCanvasElement>document.getElementById("game");
     const ctx = canvas?.getContext('2d');
@@ -38,7 +47,13 @@ function setUpCanvas() {
 
 window.onload = () => setUpCanvas();
 
-
+/**
+ * Draws the grid???
+ * @param GlobalOffsetX 
+ * @param GlobalOffsetY 
+ * @param cellWidth 
+ * @param lineWidth 
+ */
 function gridLines(GlobalOffsetX: number, GlobalOffsetY: number, cellWidth = 64, lineWidth = 2) {
     const offsetX = GlobalOffsetX % cellWidth
     const offsetY = GlobalOffsetY % cellWidth
@@ -58,6 +73,9 @@ function gridLines(GlobalOffsetX: number, GlobalOffsetY: number, cellWidth = 64,
     }
 }
 
+/**
+ * Draw function ???
+ */
 function draw() {
     //ctx.fillStyle = "#222222"
     if (ctx != undefined && player != undefined) {
@@ -68,30 +86,36 @@ function draw() {
         ctx.font = "12px Impact"
         ctx.textAlign = "center"
 
-        if (ctx != undefined) {
-            for (var playerId in gameState) {
-                const playerCanvasX = canvasCenter[0] + gameState[playerId]["pose"]["x"] - camPos[0]
-                const playerCanvasY = canvasCenter[1] + gameState[playerId]["pose"]["y"] - camPos[1]
+        if (ctx != undefined && gameState != undefined) {
+            gameState.forEach(state => {
+                const playerCanvasX = canvasCenter[0] + state.pose.x - camPos[0]
+                const playerCanvasY = canvasCenter[1] + state.pose.y - camPos[1]
                 /**
                  * @todo: check gameState objects.
                  **/
-                ctx.fillStyle = gameState[playerId]["color"]["x"];
-                // draw "Test text" at X = 10 and Y = 30   
-                ctx.fillText(gameState["playerId"]["name"]["x"], playerCanvasX + 20, playerCanvasY - 25);
-                ctx.fillRect(playerCanvasX,
-                    playerCanvasY,
-                    40,
-                    40);
-            }
+                if (ctx != undefined) {
+                    ctx.fillStyle = gameState.color.x;
+                    // draw "Test text" at X = 10 and Y = 30   
+                    ctx.fillText(gameState["playerId"]["name"]["x"], playerCanvasX + 20, playerCanvasY - 25);
+                    ctx.fillRect(playerCanvasX,
+                        playerCanvasY,
+                        40,
+                        40);
+                }
+            });
         }
     }
 }
 
 var diffPose = new Pose(0, 0, 0);
 const socket = socketio();
+
+// State of this connected player.
 var player: PlayerState | undefined;
 var mouseOffset = [0, 0];
-var gameState: { [x: string]: { [x: string]: { [x: string]: any; }; }; };
+
+// States of all connected players.
+let gameState: PlayerState[] = [];
 var dirUp = false;
 var dirDown = false;
 var dirLeft = false;
@@ -100,10 +124,17 @@ var dirRight = false;
 var canvas = <HTMLCanvasElement>document.getElementById('game');
 var ctx = canvas.getContext("2d");
 
+
+/**
+ * Adds event listeners on mouseover.
+ */
 canvas.addEventListener('mouseover', function () {
     addCanvasEventListeners();
 })
 
+/**
+ * Removes event listeners on mouseout.
+ */
 canvas.addEventListener('mouseout', function () {
     removeCanvasEventListeners();
 })
@@ -125,6 +156,10 @@ function mousemoveEventListener(e: { offsetX: number; offsetY: number; }) {
 }
 
 
+/**
+ * Event listener for keyboard press movement (WASD).
+ * @param event Keyboard event this handles.
+ */
 function keydownEventListener(event: KeyboardEvent) {
     event.preventDefault();
 
@@ -153,7 +188,6 @@ function sendUpdate() {
     diffPose.x += dirRight ? 10 : 0
     diffPose.x += dirLeft ? -10 : 0
     socket.emit('keypressed', diffPose);
-
 }
 
 window.setInterval(draw, 33);
@@ -165,17 +199,22 @@ socket.on('newuser', (userid: any) => {
 
     document.getElementById("transparent-background")!.hidden = false;
     document.getElementById("login")!.hidden = false;
-    player = new PlayerState(userid, new Pose(0, 0, 0));
+    //  player = new PlayerState(userid, new Pose(0, 0, 0));
 });
 
 
 
-// General key press or movement or whatever.
+/**
+ * General key press or movement or whatever.
+ **/
 socket.on('movement', function (msg: string) {
+    console.log(JSON.stringify(msg));
+    // debugger
     gameState = JSON.parse(msg)
     if (player != undefined) {
-        player.pose.x = gameState[player.id]["pose"]["x"]
-        player.pose.y = gameState[player.id]["pose"]["y"]
+        const tmpPlayer = gameState.find(x => x.id === player?.id);
+        if (tmpPlayer != undefined)
+            player.pose = tmpPlayer.pose;
     }
 });
 
