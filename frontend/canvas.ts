@@ -1,5 +1,4 @@
-import { timer } from "rxjs";
-import { io } from "./../node_modules/socket.io-client";
+const socketio = require("socket.io-client");
 
 class Pose {
     x;
@@ -89,7 +88,7 @@ function draw() {
 }
 
 var diffPose = new Pose(0, 0, 0);
-const socket = io();
+const socket = socketio();
 var player: PlayerState | undefined;
 var mouseOffset = [0, 0];
 var gameState: { [x: string]: { [x: string]: { [x: string]: any; }; }; };
@@ -181,20 +180,16 @@ socket.on('movement', function (msg: string) {
 });
 
 socket.on('loginsuccessful', function (msg: any) {
-    timer(1000).subscribe(() => {
-        document.getElementById("transparent-background")!.hidden = true;
-        document.getElementById("login")!.hidden = true;
-        console.log(`Log in successful: ${JSON.stringify(msg)}`)
-    });
+    document.getElementById("transparent-background")!.hidden = true;
+    document.getElementById("login")!.hidden = true;
+    console.log(`Log in successful: ${JSON.stringify(msg)}`)
 });
 
 // Register was successful
 socket.on('registersuccessful', function (msg: any) {
-    timer(1000).subscribe(() => {
-        document.getElementById("transparent-background")!.hidden = true;
-        document.getElementById("login")!.hidden = true;
-        console.log(`Register successful: ${JSON.stringify(msg)}`)
-    });
+    document.getElementById("transparent-background")!.hidden = true;
+    document.getElementById("login")!.hidden = true;
+    console.log(`Register successful: ${JSON.stringify(msg)}`)
 });
 
 // Log in
