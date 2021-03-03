@@ -116,7 +116,7 @@ function draw() {
         ctx.textAlign = "center"
 
         if (ctx != undefined && gameState != undefined) {
-            for (let playerIndex in gameState){
+            for (let playerIndex in gameState) {
                 let state = gameState[playerIndex];
                 const playerCanvasX = canvasCenter[0] + state.pose.x - camPos[0]
                 const playerCanvasY = canvasCenter[1] + state.pose.y - camPos[1]
@@ -132,7 +132,7 @@ function draw() {
                         40,
                         40);
                 }
-            };
+            }
         }
     }
 }
@@ -145,7 +145,7 @@ var player: PlayerState | undefined;
 var mouseOffset = [0, 0];
 
 // States of all connected players.
-let gameState: {[index: string]: PlayerState} = {};
+let gameState: { [index: string]: PlayerState } = {};
 var dirUp = false;
 var dirDown = false;
 var dirLeft = false;
@@ -244,11 +244,10 @@ socket.on('movement', function (msg: string) {
     var gameStateJSONObject = JSON.parse(msg);
     for (let playerId in gameStateJSONObject) {
         let value = gameStateJSONObject[playerId];
-        let name = value["name"]
         let pose = new Pose(value["pose"]["x"], value["pose"]["y"], value["pose"]["w"])
-        if (!(playerId in gameState)){
+        if (!(playerId in gameState)) {
             gameState[playerId] = new PlayerState(value["name"], pose, value["color"])
-        }else{
+        } else {
             gameState[playerId].pose = pose;
         }
     }
@@ -258,7 +257,7 @@ socket.on('movement', function (msg: string) {
 socket.on('loginsuccessful', function (msg: any) {
     document.getElementById("login_window")!.hidden = true;
     console.log(`Log in successful: ${JSON.stringify(msg)}`)
-    player = new PlayerState(msg["name"], new Pose(0,0,0), "red");
+    player = new PlayerState(msg["name"], new Pose(0, 0, 0), "red");
     // Store player state in gamestate referenced by socketId
     gameState[msg["socketId"]] = player;
 });

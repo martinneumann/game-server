@@ -81,7 +81,7 @@ class GameWorld {
         var newPlayer: Player = new Player(name, socket.id);
         this.clientSockets.set(name, socket);
         this.connectedClients.set(name, newPlayer);
-        console.log(`Connected clients are: ${this.connectedClients}`)
+        console.log(`Connected clients: ${JSON.stringify(this.connectedClients)}`)
 
         return newPlayer;
     }
@@ -106,8 +106,8 @@ const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
-app.use(express.static('frontend/build'));
-app.use(express.static('frontend/css'));
+app.use(express.static('dist/assets/css'));
+app.use(express.static('dist/'));
 
 app.get('/', (req: any, res: { sendFile: (arg0: string) => void; }) => {
     res.sendFile(__dirname + '/index.html');
