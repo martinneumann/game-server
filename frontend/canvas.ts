@@ -33,8 +33,8 @@ class PlayerState {
 function login_function() {
     var name = document.getElementById("name1")!.innerText
     var pwd = document.getElementById("pwd1")!.innerText
-    console.log(name)
-    console.log(pwd)
+    console.log("Name " + name)
+    console.log(" Pwd " + pwd)
 
     socket.emit('login', { name, pwd })
 }
@@ -157,8 +157,8 @@ var ctx = canvas.getContext("2d");
 // HTML Button Listeners
 var loginButton = <HTMLCanvasElement>document.getElementById('loginbutton')
 var registerButton = <HTMLCanvasElement>document.getElementById('registerbutton')
-loginButton.addEventListener('click', login);
-registerButton.addEventListener('click', register);
+loginButton.addEventListener('click', login_function);
+registerButton.addEventListener('click', register_function);
 
 /**
  * Adds event listeners on mouseover.

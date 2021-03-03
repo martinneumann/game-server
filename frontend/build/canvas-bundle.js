@@ -28,8 +28,8 @@ var PlayerState = /** @class */ (function () {
 function login_function() {
     var name = document.getElementById("name1").innerText;
     var pwd = document.getElementById("pwd1").innerText;
-    console.log(name);
-    console.log(pwd);
+    console.log("Name " + name);
+    console.log(" Pwd " + pwd);
     socket.emit('login', { name: name, pwd: pwd });
 }
 (_a = document.getElementById("login")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", login_function, false);
@@ -126,6 +126,11 @@ var dirLeft = false;
 var dirRight = false;
 var canvas = document.getElementById('game');
 var ctx = canvas.getContext("2d");
+// HTML Button Listeners
+var loginButton = document.getElementById('loginbutton');
+var registerButton = document.getElementById('registerbutton');
+loginButton.addEventListener('click', login_function);
+registerButton.addEventListener('click', register_function);
 /**
  * Adds event listeners on mouseover.
  */
