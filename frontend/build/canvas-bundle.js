@@ -1,5 +1,9 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+var _a, _b;
 var socketio = require("socket.io-client");
+/**
+ * Pose type.
+ */
 var Pose = /** @class */ (function () {
     function Pose(x, y, w) {
         this.x = x;
@@ -8,13 +12,40 @@ var Pose = /** @class */ (function () {
     }
     return Pose;
 }());
+/**
+ * State of a player's character. Only pose for now.
+ */
 var PlayerState = /** @class */ (function () {
-    function PlayerState(id, pose) {
-        this.id = id;
+    function PlayerState(name, pose, color) {
+        this.name = name;
         this.pose = pose;
+        this.color = color;
     }
     return PlayerState;
 }());
+// Log in
+// eslint-disable-next-line no-unused-vars
+function login_function() {
+    var name = document.getElementById("name1").innerText;
+    var pwd = document.getElementById("pwd1").innerText;
+    console.log(name);
+    console.log(pwd);
+    socket.emit('login', { name: name, pwd: pwd });
+}
+(_a = document.getElementById("login")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", login_function, false);
+(_b = document.getElementById("register")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", register_function, false);
+// register
+// eslint-disable-next-line no-unused-vars
+function register_function() {
+    var name = document.getElementById("name2").innerText;
+    var pwd = document.getElementById("pwd2").innerText;
+    console.log(name);
+    console.log(pwd);
+    socket.emit('register', { name: name, pwd: pwd });
+}
+/**
+ * Sets up the canvas according to screen size.
+ */
 function setUpCanvas() {
     var canvas = document.getElementById("game");
     var ctx = canvas === null || canvas === void 0 ? void 0 : canvas.getContext('2d');
@@ -28,6 +59,13 @@ function setUpCanvas() {
     canvas.style.height = sizeHeight.toString();
 }
 window.onload = function () { return setUpCanvas(); };
+/**
+ * Draws the grid???
+ * @param GlobalOffsetX
+ * @param GlobalOffsetY
+ * @param cellWidth
+ * @param lineWidth
+ */
 function gridLines(GlobalOffsetX, GlobalOffsetY, cellWidth, lineWidth) {
     if (cellWidth === void 0) { cellWidth = 64; }
     if (lineWidth === void 0) { lineWidth = 2; }
@@ -46,45 +84,57 @@ function gridLines(GlobalOffsetX, GlobalOffsetY, cellWidth, lineWidth) {
         }
     }
 }
+/**
+ * Draw function ???
+ */
 function draw() {
-    var _a, _b, _c, _d;
     //ctx.fillStyle = "#222222"
     if (ctx != undefined && player != undefined) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        var canvasCenter = [canvas.width / 2, canvas.height / 2];
-        var camPos = [player.pose.x + mouseOffset[0] / 2, player.pose.y + mouseOffset[1] / 2];
-        gridLines(camPos[0], camPos[1]);
+        var canvasCenter_1 = [canvas.width / 2, canvas.height / 2];
+        var camPos_1 = [player.pose.x + mouseOffset[0] / 2, player.pose.y + mouseOffset[1] / 2];
+        gridLines(camPos_1[0], camPos_1[1]);
         ctx.font = "12px Impact";
         ctx.textAlign = "center";
         if (ctx != undefined && gameState != undefined) {
-            for (var playerId in gameState) {
-                var playerCanvasX = canvasCenter[0] + ((_b = (_a = gameState.playerId) === null || _a === void 0 ? void 0 : _a.pose) === null || _b === void 0 ? void 0 : _b.x) - camPos[0];
-                var playerCanvasY = canvasCenter[1] + ((_d = (_c = gameState.playerId) === null || _c === void 0 ? void 0 : _c.pose) === null || _d === void 0 ? void 0 : _d.y) - camPos[1];
+            gameState.forEach(function (state) {
+                var playerCanvasX = canvasCenter_1[0] + state.pose.x - camPos_1[0];
+                var playerCanvasY = canvasCenter_1[1] + state.pose.y - camPos_1[1];
                 /**
                  * @todo: check gameState objects.
                  **/
-                ctx.fillStyle = gameState.playerId.color.x;
-                // draw "Test text" at X = 10 and Y = 30   
-                ctx.fillText(gameState["playerId"]["name"]["x"], playerCanvasX + 20, playerCanvasY - 25);
-                ctx.fillRect(playerCanvasX, playerCanvasY, 40, 40);
-            }
+                if (ctx != undefined) {
+                    ctx.fillStyle = state.color;
+                    // draw "Test text" at X = 10 and Y = 30   
+                    ctx.fillText(state.name, playerCanvasX + 20, playerCanvasY - 25);
+                    ctx.fillRect(playerCanvasX, playerCanvasY, 40, 40);
+                }
+            });
         }
     }
 }
 var diffPose = new Pose(0, 0, 0);
 var socket = socketio();
+// State of this connected player.
 var player;
 var mouseOffset = [0, 0];
-var gameState;
+// States of all connected players.
+var gameState = [];
 var dirUp = false;
 var dirDown = false;
 var dirLeft = false;
 var dirRight = false;
 var canvas = document.getElementById('game');
 var ctx = canvas.getContext("2d");
+/**
+ * Adds event listeners on mouseover.
+ */
 canvas.addEventListener('mouseover', function () {
     addCanvasEventListeners();
 });
+/**
+ * Removes event listeners on mouseout.
+ */
 canvas.addEventListener('mouseout', function () {
     removeCanvasEventListeners();
 });
@@ -101,6 +151,10 @@ function removeCanvasEventListeners() {
 function mousemoveEventListener(e) {
     mouseOffset = [e.offsetX - canvas.width / 2, e.offsetY - canvas.height / 2];
 }
+/**
+ * Event listener for keyboard press movement (WASD).
+ * @param event Keyboard event this handles.
+ */
 function keydownEventListener(event) {
     event.preventDefault();
     /**
@@ -132,48 +186,31 @@ window.setInterval(sendUpdate, 100);
 // New user connects.
 socket.on('newuser', function (userid) {
     console.log("New user " + userid + " connected.");
-    document.getElementById("transparent-background").hidden = false;
-    document.getElementById("login").hidden = false;
-    player = new PlayerState(userid, new Pose(0, 0, 0));
+    document.getElementById("login_window").hidden = false;
+    //  player = new PlayerState(userid, new Pose(0, 0, 0));
 });
-// General key press or movement or whatever.
+/**
+ * General key press or movement or whatever.
+ **/
 socket.on('movement', function (msg) {
     console.log(JSON.stringify(msg));
+    // debugger
     gameState = JSON.parse(msg);
     if (player != undefined) {
-        player.pose.x = gameState[player.id]["pose"]["x"];
-        player.pose.y = gameState[player.id]["pose"]["y"];
+        var tmpPlayer = gameState.find(function (x) { return x.name === (player === null || player === void 0 ? void 0 : player.name); });
+        if (tmpPlayer != undefined)
+            player.pose = tmpPlayer.pose;
     }
 });
 socket.on('loginsuccessful', function (msg) {
-    document.getElementById("transparent-background").hidden = true;
-    document.getElementById("login").hidden = true;
+    document.getElementById("login_window").hidden = true;
     console.log("Log in successful: " + JSON.stringify(msg));
 });
 // Register was successful
 socket.on('registersuccessful', function (msg) {
-    document.getElementById("transparent-background").hidden = true;
-    document.getElementById("login").hidden = true;
+    document.getElementById("login_window").hidden = true;
     console.log("Register successful: " + JSON.stringify(msg));
 });
-// Log in
-// eslint-disable-next-line no-unused-vars
-function login() {
-    var name = document.getElementById("name1").innerText;
-    var pwd = document.getElementById("pwd1").innerText;
-    console.log(name);
-    console.log(pwd);
-    socket.emit('login', { name: name, pwd: pwd });
-}
-// register
-// eslint-disable-next-line no-unused-vars
-function register() {
-    var name = document.getElementById("name2").innerText;
-    var pwd = document.getElementById("pwd2").innerText;
-    console.log(name);
-    console.log(pwd);
-    socket.emit('register', { name: name, pwd: pwd });
-}
 window.addEventListener('keydown', function (e) {
     e.preventDefault();
     dirUp = dirUp || (e.key.toLowerCase() == 'w');

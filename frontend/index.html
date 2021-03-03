@@ -9,22 +9,21 @@
 <body>
     <canvas class="canvasstyle" width="1024" height="768" id="game">
     </canvas>
-    <div class="transparent-background" id="transparent-background" hidden></div>
-    <div class="login" id="login">
+    <div id="login_window" class="login">
         <div>
             <h1>Hi, please log in</h1>
             <form>
                 <input id="name1" value="Username">
                 <input id="pwd1" type="password">
-                <button type="button" onclick="login()">Log in</button>
+                <button id="login" type="button">Log in</button>
             </form>
         </div>
         <div>
             <h2>Or register</h2>
             <form>
-                <input>
-                <input id="name2" value="Username" type="password">
-                <button id="pwd2" type="button" onclick="register()">Register</button>
+                <input id="name1" value="Username">
+                <input id="pwd2" value="Password" type="password">
+                <button id="register" type="button">Register</button>
             </form>
         </div>
     </div>

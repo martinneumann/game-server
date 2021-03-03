@@ -28,6 +28,34 @@ class PlayerState {
     }
 }
 
+// Log in
+// eslint-disable-next-line no-unused-vars
+function login_function() {
+    var name = document.getElementById("name1")!.innerText
+    var pwd = document.getElementById("pwd1")!.innerText
+    console.log(name)
+    console.log(pwd)
+
+    socket.emit('login', { name, pwd })
+}
+
+document.getElementById("login")?.addEventListener("click", login_function, false);
+document.getElementById("register")?.addEventListener("click", register_function, false);
+
+// register
+// eslint-disable-next-line no-unused-vars
+function register_function() {
+    var name = document.getElementById("name2")!.innerText
+    var pwd = document.getElementById("pwd2")!.innerText
+    console.log(name)
+    console.log(pwd)
+
+    socket.emit('register', { name, pwd })
+}
+
+
+
+
 /**
  * Sets up the canvas according to screen size.
  */
@@ -199,8 +227,7 @@ window.setInterval(sendUpdate, 100);
 socket.on('newuser', (userid: any) => {
     console.log(`New user ${userid} connected.`);
 
-    document.getElementById("transparent-background")!.hidden = false;
-    document.getElementById("login")!.hidden = false;
+    document.getElementById("login_window")!.hidden = false;
     //  player = new PlayerState(userid, new Pose(0, 0, 0));
 });
 
@@ -221,40 +248,15 @@ socket.on('movement', function (msg: string) {
 });
 
 socket.on('loginsuccessful', function (msg: any) {
-    document.getElementById("transparent-background")!.hidden = true;
-    document.getElementById("login")!.hidden = true;
+    document.getElementById("login_window")!.hidden = true;
     console.log(`Log in successful: ${JSON.stringify(msg)}`)
 });
 
 // Register was successful
 socket.on('registersuccessful', function (msg: any) {
-    document.getElementById("transparent-background")!.hidden = true;
-    document.getElementById("login")!.hidden = true;
+    document.getElementById("login_window")!.hidden = true;
     console.log(`Register successful: ${JSON.stringify(msg)}`)
 });
-
-// Log in
-// eslint-disable-next-line no-unused-vars
-function login() {
-    var name = document.getElementById("name1")!.innerText
-    var pwd = document.getElementById("pwd1")!.innerText
-    console.log(name)
-    console.log(pwd)
-
-    socket.emit('login', { name, pwd })
-}
-
-// register
-// eslint-disable-next-line no-unused-vars
-function register() {
-    var name = document.getElementById("name2")!.innerText
-    var pwd = document.getElementById("pwd2")!.innerText
-    console.log(name)
-    console.log(pwd)
-
-    socket.emit('register', { name, pwd })
-}
-
 
 
 
