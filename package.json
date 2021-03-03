@@ -27,6 +27,7 @@
     "@types/vinyl-source-stream": "0.0.30",
     "express": "^4.17.1",
     "gulp": "^4.0.2",
+    "gulp-clean": "^0.4.0",
     "gulp-eslint": "^6.0.0",
     "gulp-typescript": "^6.0.0-alpha.1",
     "i": "^0.3.6",

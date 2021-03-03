@@ -3,6 +3,12 @@ import ts from 'gulp-typescript';
 const eslint = require('gulp-eslint');
 const browserify = require('browserify');
 var source = require('vinyl-source-stream');
+var clean = require('gulp-clean');
+
+task('clean', function () {
+    return src('dist', { read: false })
+        .pipe(clean());
+});
 
 task('lint', () => {
     return src(['./backend/index.ts', 'frontend/canvas.ts'])
@@ -44,5 +50,5 @@ task('move css', () => {
         .pipe(dest('./dist/assets/css/'));
 });
 
-exports.default = series('lint', 'build', 'browserify', 'move html', 'move css')
+exports.default = series('clean', 'lint', 'build', 'browserify', 'move html', 'move css')
 
