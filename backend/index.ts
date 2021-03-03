@@ -148,8 +148,8 @@ io.on('connection', (socket: Socket) => {
 
     socket.on('login', (msg: any) => {
         console.log(`Received login message: ${JSON.stringify(msg)}`);
-        gameWorld.connectPlayer(msg["name"], socket);
-        socket.emit('loginsuccessful', msg["name"]);
+        var loggedInPlayer = gameWorld.connectPlayer(msg["name"], socket);
+        socket.emit('loginsuccessful', loggedInPlayer);
     });
 
 

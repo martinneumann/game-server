@@ -107,7 +107,6 @@ function gridLines(GlobalOffsetX: number, GlobalOffsetY: number, cellWidth = 64,
  * Draw function ???
  */
 function draw() {
-    //ctx.fillStyle = "#222222"
     if (ctx != undefined && player != undefined) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         const canvasCenter = [canvas.width / 2, canvas.height / 2]
@@ -117,7 +116,8 @@ function draw() {
         ctx.textAlign = "center"
 
         if (ctx != undefined && gameState != undefined) {
-            gameState.forEach(state => {
+            for (let playerIndex in gameState){
+                let state = gameState[playerIndex];
                 const playerCanvasX = canvasCenter[0] + state.pose.x - camPos[0]
                 const playerCanvasY = canvasCenter[1] + state.pose.y - camPos[1]
                 /**
@@ -132,7 +132,7 @@ function draw() {
                         40,
                         40);
                 }
-            });
+            };
         }
     }
 }
@@ -145,7 +145,7 @@ var player: PlayerState | undefined;
 var mouseOffset = [0, 0];
 
 // States of all connected players.
-let gameState: PlayerState[] = [];
+let gameState: {[index: string]: PlayerState} = {};
 var dirUp = false;
 var dirDown = false;
 var dirLeft = false;
@@ -231,9 +231,7 @@ window.setInterval(sendUpdate, 100);
 // New user connects.
 socket.on('newuser', (userid: any) => {
     console.log(`New user ${userid} connected.`);
-
     document.getElementById("login_window")!.hidden = false;
-    //  player = new PlayerState(userid, new Pose(0, 0, 0));
 });
 
 
@@ -242,19 +240,27 @@ socket.on('newuser', (userid: any) => {
  * General key press or movement or whatever.
  **/
 socket.on('movement', function (msg: string) {
-    console.log(JSON.stringify(msg));
     // debugger
-    gameState = JSON.parse(msg)
-    if (player != undefined) {
-        const tmpPlayer = gameState.find(x => x.name === player?.name);
-        if (tmpPlayer != undefined)
-            player.pose = tmpPlayer.pose;
+    var gameStateJSONObject = JSON.parse(msg);
+    for (let playerId in gameStateJSONObject) {
+        let value = gameStateJSONObject[playerId];
+        let name = value["name"]
+        let pose = new Pose(value["pose"]["x"], value["pose"]["y"], value["pose"]["w"])
+        if (!(playerId in gameState)){
+            gameState[playerId] = new PlayerState(value["name"], pose, value["color"])
+        }else{
+            gameState[playerId].pose = pose;
+        }
     }
+    return
 });
 
 socket.on('loginsuccessful', function (msg: any) {
     document.getElementById("login_window")!.hidden = true;
     console.log(`Log in successful: ${JSON.stringify(msg)}`)
+    player = new PlayerState(msg["name"], new Pose(0,0,0), "red");
+    // Store player state in gamestate referenced by socketId
+    gameState[msg["socketId"]] = player;
 });
 
 // Register was successful
