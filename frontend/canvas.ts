@@ -126,6 +126,11 @@ var dirRight = false;
 var canvas = <HTMLCanvasElement>document.getElementById('game');
 var ctx = canvas.getContext("2d");
 
+// HTML Button Listeners
+var loginButton = <HTMLCanvasElement>document.getElementById('loginbutton')
+var registerButton = <HTMLCanvasElement>document.getElementById('registerbutton')
+loginButton.addEventListener('click', login);
+registerButton.addEventListener('click', register);
 
 /**
  * Adds event listeners on mouseover.
