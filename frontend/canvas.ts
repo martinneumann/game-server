@@ -18,11 +18,13 @@ class Pose {
  * State of a player's character. Only pose for now.
  */
 class PlayerState {
-    id: string;
     pose: Pose;
-    constructor(id: string, pose: Pose) {
-        this.id = id;
+    color: string;
+    name: string;
+    constructor(name: string, pose: Pose, color: string) {
+        this.name = name;
         this.pose = pose;
+        this.color = color;
     }
 }
 
@@ -94,9 +96,9 @@ function draw() {
                  * @todo: check gameState objects.
                  **/
                 if (ctx != undefined) {
-                    ctx.fillStyle = gameState.color.x;
+                    ctx.fillStyle = state.color;
                     // draw "Test text" at X = 10 and Y = 30   
-                    ctx.fillText(gameState["playerId"]["name"]["x"], playerCanvasX + 20, playerCanvasY - 25);
+                    ctx.fillText(state.name, playerCanvasX + 20, playerCanvasY - 25);
                     ctx.fillRect(playerCanvasX,
                         playerCanvasY,
                         40,
@@ -212,7 +214,7 @@ socket.on('movement', function (msg: string) {
     // debugger
     gameState = JSON.parse(msg)
     if (player != undefined) {
-        const tmpPlayer = gameState.find(x => x.id === player?.id);
+        const tmpPlayer = gameState.find(x => x.name === player?.name);
         if (tmpPlayer != undefined)
             player.pose = tmpPlayer.pose;
     }
