@@ -11,16 +11,22 @@ task('clean', function () {
 });
 
 task('lint', () => {
-    return src(['./backend/index.ts', 'frontend/app.ts', './frontend/environment.ts'])
+    return src(['./backend/*.ts', './backend/world generation/*.ts', 'frontend/app.ts', './frontend/environment.ts'])
         .pipe(eslint())
         .pipe(eslint.format())
         .pipe(eslint.failAfterError());
 });
 
 task('build', () => {
-    return src(['./backend/index.ts', './frontend/app.ts', './frontend/environment.ts'])
+    return src(['./backend/*.ts', './frontend/app.ts', './frontend/environment.ts'])
         .pipe(ts())
-        .pipe(dest('./dist/'));
+        .pipe(dest('./dist/'))
+});
+
+task('build world gen', () => {
+    return src(['./backend/world generation/*.ts'])
+        .pipe(ts())
+        .pipe(dest('./dist/world generation/'));
 });
 
 task('browserify', () => {
@@ -50,5 +56,5 @@ task('move css', () => {
         .pipe(dest('./dist/assets/css/'));
 });
 
-exports.default = series('lint', 'build', 'browserify', 'move html', 'move css')
+exports.default = series('lint', 'build', 'build world gen', 'browserify', 'move html', 'move css')
 

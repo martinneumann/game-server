@@ -2,6 +2,8 @@
 import { Socket } from 'socket.io';
 import * as express from 'express';
 
+import { WorldTerrainMatrix } from './world generation/world generation';
+
 /**
  * Central server because I'm lazy.
  * @author Martin Neumann
@@ -10,6 +12,11 @@ import * as express from 'express';
 /*******
  * Types
  *******/
+
+console.log(`Before world terrain`)
+const worldTerrainMatrix = new WorldTerrainMatrix();
+console.log(`After world terrain`)
+worldTerrainMatrix.generateMatrix(480, 480);
 
 const COLORS = ["red", "blue", "green", "orange", "purple"];
 
