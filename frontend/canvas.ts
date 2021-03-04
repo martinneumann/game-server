@@ -15,7 +15,7 @@ const socketio = require("socket.io-client");
 
 
 engine.runRenderLoop(function () {
-        scene.render();
+    scene.render();
 });
 
 // window.onload = () => createScene();
@@ -58,8 +58,8 @@ function login_function() {
     socket.emit('login', { name, pwd })
 }
 
-document.getElementById("login")?.addEventListener("click", login_function, false);
-document.getElementById("register")?.addEventListener("click", register_function, false);
+document.getElementById("loginbutton")?.addEventListener("click", login_function, false);
+document.getElementById("registerbutton")?.addEventListener("click", register_function, false);
 
 // register
 // eslint-disable-next-line no-unused-vars
