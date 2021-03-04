@@ -1,5 +1,24 @@
-import * as PIXI from 'pixi.js';
+import * as BABYLON from 'babylonjs';
+
+const canvas = <HTMLCanvasElement>document.getElementById("game");
+const engine = new BABYLON.Engine(canvas, true);
+const scene = new BABYLON.Scene(engine);
+const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 3, new BABYLON.Vector3(0, 0, 0), scene);
+camera.attachControl(canvas, true);
+const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+const box = BABYLON.MeshBuilder.CreateBox("box", {});
+
+scene.addLight(light);
+scene.addMesh(box);
+
 const socketio = require("socket.io-client");
+
+
+engine.runRenderLoop(function () {
+        scene.render();
+});
+
+// window.onload = () => createScene();
 /**
  * Pose type.
  */
@@ -54,19 +73,10 @@ function register_function() {
 }
 
 
-
-
 /**
  * Sets up the canvas according to screen size.
  */
-function setUpPIXI() {
-    let app = new PIXI.Application({width: 1024, height: 1024, forceCanvas: true});
-    app.renderer.backgroundColor = 0x061639;
-    app.renderer.resize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(app.view);
-}
 
- window.onload = () => setUpPIXI();
 
 /**
  * Draws the grid???
@@ -105,8 +115,8 @@ function sendUpdate() {
     socket.emit('keypressed', diffPose);
 }
 
-window.setInterval(sendUpdate, 100);
 
+window.setInterval(sendUpdate, 100);
 // New user connects.
 socket.on('newuser', (userid: any) => {
     console.log(`New user ${userid} connected.`);
