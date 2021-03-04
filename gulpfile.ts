@@ -11,14 +11,14 @@ task('clean', function () {
 });
 
 task('lint', () => {
-    return src(['./backend/index.ts', 'frontend/canvas.ts'])
+    return src(['./backend/index.ts', 'frontend/app.ts', './frontend/environment.ts'])
         .pipe(eslint())
         .pipe(eslint.format())
         .pipe(eslint.failAfterError());
 });
 
 task('build', () => {
-    return src(['./backend/index.ts', './frontend/canvas.ts'])
+    return src(['./backend/index.ts', './frontend/app.ts', './frontend/environment.ts'])
         .pipe(ts())
         .pipe(dest('./dist/'));
 });
@@ -31,12 +31,12 @@ task('browserify', () => {
             cache: {},
             packageCache: {},
             fullPaths: true,
-            entries: ['./dist/canvas.js'],
+            entries: ['./dist/app.js'],
         }
     )
         .bundle()
         .on("error", function (err: { message: string; }) { console.log("Error : " + err.message); })
-        .pipe(source('canvas.js'))
+        .pipe(source('app.js'))
         .pipe(dest('./dist'));
 });
 

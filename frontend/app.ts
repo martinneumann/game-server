@@ -1,22 +1,54 @@
-import * as BABYLON from 'babylonjs';
+import {Engine, Scene, ArcRotateCamera, HemisphericLight, Color4} from 'babylonjs';
+import {Vector3} from 'babylonjs';
+import {Environment} from './environment'; 
 
-const canvas = <HTMLCanvasElement>document.getElementById("game");
-const engine = new BABYLON.Engine(canvas, true);
-const scene = new BABYLON.Scene(engine);
-const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 3, new BABYLON.Vector3(0, 0, 0), scene);
-camera.attachControl(canvas, true);
-const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
-const box = BABYLON.MeshBuilder.CreateBox("box", {});
+class App {
+    private _canvas: HTMLCanvasElement;
+    private _scene!: Scene;
+    private _engine: Engine;
+    private _environment!: Environment;
+    constructor() {
+        // create the canvas html element and attach it to the webpage
+        this._canvas = <HTMLCanvasElement>document.getElementById("gameCanvas");
+        this._canvas.style.width = "100%";
+        this._canvas.style.height = "100%";
+        this._canvas.id = "gameCanvas";
+        document.body.appendChild(this._canvas);
+        // initialize babylon scene and engine
+        this._engine = new Engine(this._canvas, true);
+        this._setUpGame();
+        // hide/show the Inspector
+        window.addEventListener("keydown", (ev) => {
+            // Shift+Ctrl+Alt+I
+            if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.keyCode === 73) {
+                if (this._scene.debugLayer.isVisible()) {
+                    this._scene.debugLayer.hide();
+                } else {
+                    this._scene.debugLayer.show();
+                }
+            }
+        });
+        // run the main render loop
+        this._engine.runRenderLoop(() => {
+            this._scene.render();
+        });
+        window.addEventListener('resize', () => {
+            this._engine.resize();
+        })
+    }
+    private _setUpGame(){
+        this._scene = new Scene(this._engine);
+        this._scene.clearColor = new Color4(0.2,0.0,0.2,1);
+        var camera: ArcRotateCamera = new ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, Vector3.Zero(), this._scene);
+        camera.attachControl(this._canvas, true);
+        new HemisphericLight("light1", new Vector3(1, 1, 0), this._scene);
+        this._environment = new Environment(this._scene);
+    }
+}
+new App();
 
-scene.addLight(light);
-scene.addMesh(box);
 
 const socketio = require("socket.io-client");
-
-
-engine.runRenderLoop(function () {
-    scene.render();
-});
 
 // window.onload = () => createScene();
 /**
