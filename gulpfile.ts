@@ -50,5 +50,5 @@ task('move css', () => {
         .pipe(dest('./dist/assets/css/'));
 });
 
-exports.default = series('clean', 'lint', 'build', 'browserify', 'move html', 'move css')
+exports.default = series('lint', 'build', 'browserify', 'move html', 'move css')
 
