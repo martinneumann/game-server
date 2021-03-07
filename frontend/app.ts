@@ -1,12 +1,15 @@
-import {Engine, Scene, ArcRotateCamera, HemisphericLight, Color4} from 'babylonjs';
-import {Vector3} from 'babylonjs';
-import {Environment} from './environment'; 
+import { Engine, Scene, ArcRotateCamera, HemisphericLight, Color4 } from 'babylonjs';
+import { Vector3 } from 'babylonjs';
+// eslint-disable-next-line no-unused-vars
+import { CustomMeshData } from '../data objects/data-objects';
+import { Environment } from './environment';
 
 class App {
     private _canvas: HTMLCanvasElement;
     private _scene!: Scene;
     private _engine: Engine;
     private _environment!: Environment;
+
     constructor() {
         // create the canvas html element and attach it to the webpage
         this._canvas = <HTMLCanvasElement>document.getElementById("gameCanvas");
@@ -36,16 +39,22 @@ class App {
             this._engine.resize();
         })
     }
-    private _setUpGame(){
+
+    private _setUpGame() {
         this._scene = new Scene(this._engine);
-        this._scene.clearColor = new Color4(0.2,0.0,0.2,1);
+        this._scene.clearColor = new Color4(0.2, 0.0, 0.2, 1);
         var camera: ArcRotateCamera = new ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, Vector3.Zero(), this._scene);
         camera.attachControl(this._canvas, true);
         new HemisphericLight("light1", new Vector3(1, 1, 0), this._scene);
         this._environment = new Environment(this._scene);
     }
+
+    public createGroundMesh(msg: CustomMeshData) {
+        this._environment.createMesh(msg);
+    }
 }
-new App();
+
+const app = new App();
 
 
 const socketio = require("socket.io-client");
@@ -189,6 +198,15 @@ socket.on('registersuccessful', function (msg: any) {
     console.log(`Register successful: ${JSON.stringify(msg)}`)
 });
 
+
+/**
+ * Receive mesh data for a custom mesh. Contains vertices and indices.
+ * Then used to create a custom mesh.
+ */
+socket.on('custommeshdata', (msg: CustomMeshData) => {
+    console.log(`Received mesh data`)
+    app.createGroundMesh(msg);
+});
 
 
 window.addEventListener('keydown', function (e) {

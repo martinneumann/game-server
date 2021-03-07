@@ -2,7 +2,9 @@
 import { Socket } from 'socket.io';
 import * as express from 'express';
 
-import { WorldTerrainMatrix } from './world generation/world generation';
+import { WorldGenerator } from './world generation/world generation';
+// eslint-disable-next-line no-unused-vars
+import { CustomMeshData } from '../data objects/data-objects';
 
 /**
  * Central server because I'm lazy.
@@ -13,10 +15,6 @@ import { WorldTerrainMatrix } from './world generation/world generation';
  * Types
  *******/
 
-console.log(`Before world terrain`)
-const worldTerrainMatrix = new WorldTerrainMatrix();
-console.log(`After world terrain`)
-worldTerrainMatrix.generateMatrix(480, 480);
 
 const COLORS = ["red", "blue", "green", "orange", "purple"];
 
@@ -55,6 +53,8 @@ function mapToJSON(map: Map<string, Object>): string {
 class GameWorld {
     connectedClients: Map<string, Player> = new Map<string, Player>();
     clientSockets: Map<string, Socket> = new Map<string, Socket>();
+
+    terrain: WorldGenerator = new WorldGenerator();
 
     /**
      * Changes a Player's pose based on the data that arrived.
@@ -134,7 +134,9 @@ io.on('connection', (socket: Socket) => {
 
     console.log(`A user connected. Socket: ${socket.id} `);
     var newPlayer = gameWorld.connectPlayer(socket.id, socket);
+
     console.log(`New Player: ${JSON.stringify(newPlayer)} `);
+
 
 
     socket.on('disconnect', () => {
@@ -165,4 +167,23 @@ io.on('connection', (socket: Socket) => {
         gameWorld.connectPlayer(msg["name"], socket);
         socket.emit('registersuccessful', msg["name"]);
     });
+
+    gameWorld.terrain.generateMatrix(8, 8).then((result: CustomMeshData) => {
+        socket.emit('custommeshdata',
+            result
+        );
+    });
+
 });
+
+/**
+ * World generation
+ */
+/*
+function generateWorld() {
+    const worldTerrainMatrix = new WorldTerrainMatrix(480, 480);
+    worldTerrainMatrix.generateMatrix(480, 480).then(result => {
+        console.log(`World generation ${result}.`);
+    });
+}
+*/
