@@ -168,7 +168,7 @@ io.on('connection', (socket: Socket) => {
         socket.emit('registersuccessful', msg["name"]);
     });
 
-    gameWorld.terrain.generateMatrix(8, 8).then((result: CustomMeshData) => {
+    gameWorld.terrain.generateMatrix(256, 256).then((result: CustomMeshData) => {
         socket.emit('custommeshdata',
             result
         );

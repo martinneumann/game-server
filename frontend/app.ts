@@ -43,10 +43,10 @@ class App {
     private _setUpGame() {
         this._scene = new Scene(this._engine);
         this._scene.clearColor = new Color4(0.2, 0.0, 0.2, 1);
-        var camera: ArcRotateCamera = new ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, Vector3.Zero(), this._scene);
-        camera.attachControl(this._canvas, true);
+        var camera: ArcRotateCamera = new ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 100, Vector3.Zero(), this._scene);
         new HemisphericLight("light1", new Vector3(1, 1, 0), this._scene);
         this._environment = new Environment(this._scene);
+        camera.attachControl(this._canvas, true);
     }
 
     public createGroundMesh(msg: CustomMeshData) {
