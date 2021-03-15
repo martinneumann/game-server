@@ -1,4 +1,4 @@
-import { Engine, Scene, ArcRotateCamera, HemisphericLight, Color4 } from 'babylonjs';
+import { Engine, Scene, HemisphericLight, Color4, UniversalCamera } from 'babylonjs';
 import { Vector3 } from 'babylonjs';
 // eslint-disable-next-line no-unused-vars
 import { CustomMeshData } from '../data objects/data-objects';
@@ -42,11 +42,24 @@ class App {
 
     private _setUpGame() {
         this._scene = new Scene(this._engine);
-        this._scene.clearColor = new Color4(0.2, 0.0, 0.2, 1);
-        var camera: ArcRotateCamera = new ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 100, Vector3.Zero(), this._scene);
+        this._scene.gravity = new Vector3(0.0, -9.81 / 60, 0.0);
+        this._scene.clearColor = new Color4(0.6, 0.6, 0.8, 1);
+        const startPos = new Vector3(0, 10, 0);
+        var camera: UniversalCamera = new UniversalCamera("Camera", startPos, this._scene);
+        camera.setTarget(startPos.add(new Vector3(1, 0, 0)));
         new HemisphericLight("light1", new Vector3(1, 1, 0), this._scene);
         this._environment = new Environment(this._scene);
+        camera.ellipsoid = new Vector3(1, 1, 1);
         camera.attachControl(this._canvas, true);
+        camera.speed = 0.02;
+        camera.applyGravity = true;
+        this._scene.collisionsEnabled = true;
+        camera.checkCollisions = true;
+
+        // camera.inputs.removeByType("FreeCameraKeyboardMoveInput");
+        // camera.inputs.removeByType("FreeCameraMouseInput");
+
+        //Key Input Manager To Use Keys to Move Forward and BackWard and Look to the Left or Right
     }
 
     public createGroundMesh(msg: CustomMeshData) {
@@ -64,9 +77,9 @@ const socketio = require("socket.io-client");
  * Pose type.
  */
 class Pose {
-    x;
-    y;
-    w;  // orientation in whatever unit game maker provides
+    x: number;
+    y: number;
+    w: number;  // orientation in whatever unit game maker provides
     constructor(x: number, y: number, w: number) {
         this.x = x;
         this.w = w;
