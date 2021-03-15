@@ -24,8 +24,8 @@ export class WorldGenerator {
                 for (let col = 0; col < width; col++ ) {
                     let index = (row * width + col) * 3;
                     customMeshData.verticesVector[index] = row - height / 2;
-                    customMeshData.verticesVector[index + 1] = col - width / 2;
-                    customMeshData.verticesVector[index + 2] = noiseVector[index / 3] * scale;
+                    customMeshData.verticesVector[index + 1] = noiseVector[index / 3] * scale;
+                    customMeshData.verticesVector[index + 2] = col - width / 2;
 
                 }
             }
@@ -37,13 +37,13 @@ export class WorldGenerator {
                     let baseOffset = (row * width + col);
                     let indexOffset = baseOffset * 6;
                     // first triangle
-                    customMeshData.indicesVector[indexOffset] = baseOffset + 1;
+                    customMeshData.indicesVector[indexOffset] = baseOffset;
                     customMeshData.indicesVector[indexOffset + 1] = baseOffset + width;
-                    customMeshData.indicesVector[indexOffset + 2] = baseOffset;
+                    customMeshData.indicesVector[indexOffset + 2] = baseOffset + 1;
                     // second triangle
-                    customMeshData.indicesVector[indexOffset + 3] = baseOffset + width + 1;
+                    customMeshData.indicesVector[indexOffset + 3] = baseOffset + 1;
                     customMeshData.indicesVector[indexOffset + 4] = baseOffset + width;
-                    customMeshData.indicesVector[indexOffset + 5] = baseOffset + 1;
+                    customMeshData.indicesVector[indexOffset + 5] = baseOffset + width + 1;
                 }
             }
         
