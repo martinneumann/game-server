@@ -123,6 +123,12 @@ app.get('/', (req: any, res: { sendFile: (arg0: string) => void; }) => {
 
 console.log(`Creating game world...`);
 const gameWorld = new GameWorld();
+console.log(`Generating terrain.`);
+let noiseMeshData: CustomMeshData;
+
+gameWorld.terrain.generateMatrix(64, 64).then((result: CustomMeshData) => {
+    noiseMeshData = result;
+});
 
 http.listen(3000, () => {
     console.log('Server listening on *:3000');
@@ -168,11 +174,9 @@ io.on('connection', (socket: Socket) => {
         socket.emit('registersuccessful', msg["name"]);
     });
 
-    gameWorld.terrain.generateMatrix(256, 256).then((result: CustomMeshData) => {
-        socket.emit('custommeshdata',
-            result
-        );
-    });
+    socket.emit('custommeshdata',
+        noiseMeshData);
+
 
 });
 
