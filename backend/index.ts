@@ -2,9 +2,29 @@
 import { Socket } from 'socket.io';
 import * as express from 'express';
 
+const graphqlHTTP = require('express-graphql')
+const graphql = require('graphql')
+
+
 import { WorldGenerator } from './world generation/world generation';
 // eslint-disable-next-line no-unused-vars
 import { CustomMeshData } from '../data objects/data-objects';
+
+/**
+ * GraphQL
+ */
+
+const QueryRoot = new graphql.GraphQLObjectType({
+    name: 'Query',
+    fields: () => ({
+        hello: {
+            type: graphql.GraphQLString,
+            resolve: () => "Hello world!"
+        }
+    })
+});
+
+const schema = new graphql.GraphQLSchema({ query: QueryRoot });
 
 /**
  * Central server because I'm lazy.
@@ -115,6 +135,10 @@ const io = require('socket.io')(http);
 
 app.use(express.static('dist/assets/css'));
 app.use(express.static('dist/'));
+app.use('/api', graphqlHTTP.graphqlHTTP({
+    schema: schema,
+    graphiql: true,
+}));
 
 app.get('/', (req: any, res: { sendFile: (arg0: string) => void; }) => {
     res.sendFile(__dirname + '/index.html');
